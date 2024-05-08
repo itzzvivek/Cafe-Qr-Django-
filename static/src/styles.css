@@ -557,3 +557,7 @@ video {
 .static {
   position: static;
 }
+
+.block {
+  display: block;
+}
