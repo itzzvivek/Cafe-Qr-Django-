@@ -1,21 +1,18 @@
 from django.shortcuts import render
 from cafeAdmin.models import Category, MenuItem
 from cafeAdmin.serializers import CategorySerializer, MenuItemSerializer
-from django.http import JsonResponse
-from rest_framework.parsers import JSONParser
+from rest_framework import viewsets
+from rest_framework.renderers import TemplateHTMLRenderer
 
 
-def menu_view(request):
-    # if request.method == "GET":
-    #     category = Category.objects.all()
-    #     serializer = CategorySerializer(category, many=True)
-    #     return JsonResponse(serializer.data, safe=False)
-    # elif request.method == "POST":
-    #     data = JSONParser().parse(request)
-    #     serializer = CategorySerializer(data=data)
-    #
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return JsonResponse(serializer.data, status=200)
-    #     return JsonResponse(serializer.errors, status=400)
-    return render(request, 'user_temp/user_menu.html')
+class MenuViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def list(self, request, *args, **kwargs):
+        categories = self.get_queryset()
+        serializers = self.get_serializer(categories, many=True)
+        menu_times = MenuItem.objects.all()
+        menu_item_serializer = MenuItemSerializer(menu_times, many=True)
+        return render(request, 'user_temp/user_menu.html', {'categories': serializers.data,
+                                                            'menu_item': menu_item_serializer})
