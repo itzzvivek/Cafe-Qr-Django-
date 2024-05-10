@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
 
 
-def CategoriesView(request):
+def categories_view(request):
     if request.method == "GET":
         category = Category.objects.all()
         serializer = CategorySerializer(category, many=True)

@@ -1,5 +1,53 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1>This is customer side</h1>
+   <div class="container mx-auto py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Menu</h1>
+        <div class="w-full">
+            <!-- Category Bar -->
+            <div class="w-full mb-8">
+                <button
+                    class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg mb-2">Category
+                    1</button>
+                <div class="hidden">
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 1</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 2</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 3</button>
+                </div>
+                <button
+                    class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg mb-2">Category
+                    2</button>
+                <div class="hidden">
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 4</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 5</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 6</button>
+                </div>
+                <button
+                    class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg mb-2">Category
+                    3</button>
+                <div class="hidden">
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 7</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 8</button>
+                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">Menu
+                        Item 9</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.bg-gray-200').forEach(button => {
+            button.addEventListener('click', () => {
+                button.nextElementSibling.classList.toggle('hidden');
+            });
+        });
+    </script>
+
 {% endblock %}
