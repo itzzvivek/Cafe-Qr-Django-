@@ -6,13 +6,14 @@ from rest_framework.renderers import TemplateHTMLRenderer
 
 
 class MenuViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.prefetch_related('items').all()
     serializer_class = CategorySerializer
 
     def list(self, request, *args, **kwargs):
         categories = self.get_queryset()
         serializers = self.get_serializer(categories, many=True)
-        menu_times = MenuItem.objects.all()
-        menu_item_serializer = MenuItemSerializer(menu_times, many=True)
+        menu_items = MenuItem.objects.all()
+        menu_item_serializer = MenuItemSerializer(menu_items, many=True)
         return render(request, 'user_temp/user_menu.html', {'categories': serializers.data,
-                                                            'menu_item': menu_item_serializer})
+                                                            'menu_items': menu_item_serializer.data})
+

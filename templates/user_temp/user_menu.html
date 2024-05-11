@@ -11,9 +11,16 @@
                     class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg mb-2">{{ category.name }}</button>
 
                 <div class="hidden">
-                    {% for item in category.items.all %}
-                    <button class="bg-gray-100 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg">{{ item.name }}</button>
-                    {% endfor %}
+                    {% if category.items.all %}
+                        <p>Items:</p>
+                        <ul>
+                        {% for item in category.items.all %}
+                            <li>{{ item.name }} - {{ item.max_price }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No items found for this category.</p>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
