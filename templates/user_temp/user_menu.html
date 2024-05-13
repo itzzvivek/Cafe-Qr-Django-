@@ -1,38 +1,33 @@
-{% extends 'base.html' %}
+{% extends 'base.html'%}
 {% block content %}
-   <div class="container mx-auto py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Menu</h1>
-        <div class="w-full">
-            <!-- Category Bar -->
+<h1>Menu</h1>
+<div id="accordion">
+  {% for category in categories %}
+    <div class="card">
+      <div class="card-header" id="heading-{{ category.id }}">
+        <h5 class="mb-0">
+          <button class="btn btn-link collapsed text-blue-600" data-toggle="collapse" data-target="#collapse-{{ category.id }}" aria-expanded="false" aria-controls="collapse-{{ category.id }}">
+            {{ category.name }}
+          </button>
+        </h5>
+      </div>
 
-            <div class="w-full mb-8">
-                {% for category in categories %}
-                <button
-                    class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 w-full text-left rounded-lg mb-2">{{ category.name }}</button>
-
-                <div class="hidden">
-                    {% if category.items.all %}
-                        <p>Items:</p>
-                        <ul>
-                        {% for item in category.items.all %}
-                            <li>{{ item.name }} - {{ item.max_price }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No items found for this category.</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
+      <div id="collapse-{{ category.id }}" class="collapse" aria-labelledby="heading-{{ category.id }}" data-parent="#accordion">
+        <div class="card-body">
+          <ul>
+            {% for item in category.menu_items.all %}
+              <li>{{ item.name }} - {{ item.price }}{% if item.min_price %} to {{ item.min_price }}{% endif %}</li>
+            {% endfor %}
+          </ul>
         </div>
+      </div>
+        {% for items in menu_items %}
+            <div>
+                {{ items.name }}
+            </div>
+        {% endfor %}
     </div>
-
-    <script>
-        document.querySelectorAll('.bg-gray-200').forEach(button => {
-            button.addEventListener('click', () => {
-                button.nextElementSibling.classList.toggle('hidden');
-            });
-        });
-    </script>
+  {% endfor %}
+</div>
 
 {% endblock %}
