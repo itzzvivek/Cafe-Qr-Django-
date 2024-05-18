@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from cafeAdmin.models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
+from django.views.generic import ListView, DetailView, View
 
 
 def menu_view(request):
@@ -13,6 +14,19 @@ def menu_view(request):
         'menu_items': menu_items
     }
     return render(request, 'user_temp/user_menu.html', context)
+
+
+def OrderSummaryView(View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.object.get(user=self.get.request.user, ordered=False)
+            context = {
+                'object': order
+            }
+            return render(self.request, 'user_temp/order_summary.html', context)
+        except ObjectDoesNotExist:
+            message.warning(self.request, 'You do not have an active order')
+            return redirect("/")
 
 
 def add_to_cart(request, slug):
@@ -36,7 +50,7 @@ def add_to_cart(request, slug):
             message.info(request, "This item was added to your cart.")
             return redirect("core:order-summary")
     else:
-        order_date = timezone.now()
+        ordered_date = timezone.now()
         order = Order.object.create(
             user=request.user, ordered_data=ordered_date)
         order.items.add(order_item)
