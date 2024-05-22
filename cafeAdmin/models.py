@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -31,6 +32,7 @@ class MenuItem(models.Model):
 
 
 class OrderItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=False)
     ordered = models.BooleanField(default=False)
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -54,6 +56,7 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=False)
     customer_name = models.CharField(max_length=50)
     phone_number = models.IntegerField()
     email = models.EmailField(max_length=245)
