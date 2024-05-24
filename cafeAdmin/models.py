@@ -18,14 +18,19 @@ class MenuItem(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=False, null=True)
 
     def __str__(self):
-        return self.nam
+        return self.name
 
-    def get_add_to_cart(self):
+    def get_absolute_url(self):
+        return reverse('core:menu', kwargs={
+            'slug': self.slug
+        })
+
+    def get_add_to_cart_url(self):
         return reverse("core:add-to-cart", kwargs={
             'slug': self.slug
         })
 
-    def get_remove_from_cart(self):
+    def get_remove_from_cart_url(self):
         return reverse("core:remove-from-cart", kwargs={
             "slug": self.slug
         })

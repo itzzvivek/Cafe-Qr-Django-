@@ -31,14 +31,14 @@
         <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeModal">&times;</button>
         <h2 class="text-xl font-bold mb-4" id="modalTitle">Add Quantity</h2>
         <p>Menu Item: <span id="itemName"></span></p>
-        <div class="my-4">
-            <label class="block mb-2">Half Portion:</label>
-            <div class="flex items-center">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</button>
-                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="1">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>
-            </div>
-        </div>
+<!--        <div class="my-4">-->
+<!--            <label class="block mb-2">Half Portion:</label>-->
+<!--            <div class="flex items-center">-->
+<!--                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</button>-->
+<!--                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="1">-->
+<!--                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>-->
+<!--            </div>-->
+<!--        </div>-->
         <div class="my-4">
             <label class="block mb-2">Full Portion:</label>
             <div class="flex items-center">
@@ -48,7 +48,7 @@
             </div>
         </div>
         <div class="flex justify-end">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" id="addToCart"><a href="{{ object.get_add_to_cart_url }}">Add to Cart</a></button>
+            <a href="{{ object.get_add_to_cart_url }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add to Cart</a>
         </div>
     </div>
 </div>
