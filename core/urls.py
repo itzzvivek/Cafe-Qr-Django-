@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import menu_view, add_to_cart, OrderSummaryView, remove_from_cart
 
+app_name = 'core'
 
 urlpatterns = [
     path('menu/', menu_view, name='menu'),
