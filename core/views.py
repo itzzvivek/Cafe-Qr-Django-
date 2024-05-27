@@ -33,12 +33,13 @@ class OrderSummaryView(View):
                 cart = request.session.get('cart', {})
                 order_items = []
                 total = 0
-                for slug, item in cart.items():
+                for key, item in cart.items():
                     total += float(item['price']) * item['quantity']
                     order_items.append({
                         'item': item,
                         'quantity': item['quantity'],
-                        'total_price': float(item['price']) * item['quantity']
+                        'total_price': float(item['price']) * item['quantity'],
+                        'is_half_portion': item["is_half_portion"]
                     })
                 context = {
                     'order_items': order_items,
@@ -52,17 +53,19 @@ class OrderSummaryView(View):
 
 def add_to_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
+    is_half_portion = request.GET.get('portion') == 'half'
     if request.user.is_authenticated:
         order_item, created = OrderItem.objects.get_or_create(
             item=item,
             user=request.user,
-            ordered=False
+            ordered=False,
+            is_half_portion=is_half_portion
         )
         order_qs = Order.objects.filter(user=request.user, ordered=False)
         if order_qs.exists():
             order = order_qs[0]
             # check if the order item is in the order
-            if order.items.filter(item__slug=item.slug).exists():
+            if order.items.filter(item__slug=item.slug, is_half_portion=is_half_portion).exists():
                 order_item.quantity += 1
                 order_item.save()
                 messages.info(request, "This item quantity was updated.")
@@ -80,10 +83,13 @@ def add_to_cart(request, slug):
             return redirect("core:order-summary")
     else:
         cart = request.session.get('cart', {})
-        cart_item = cart.get(slug, {
+        portion_key = 'half' if is_half_portion else 'full'
+        cart_key = f"{slug}_{portion_key}"
+        cart_item = cart.get(cart_key, {
             'name': item.name,
             'quantity': 0,
-            'price': str(item.max_price),
+            'price': str(item.min_price if is_half_portion else item.max_price),
+            'is_half_portion': is_half_portion
         })
         cart_item['quantity'] += 1
         cart[slug] = cart_item

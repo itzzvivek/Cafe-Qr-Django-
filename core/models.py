@@ -42,9 +42,13 @@ class OrderItem(models.Model):
     ordered = models.BooleanField(default=False)
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    is_half_portion = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.quantity} of {self.item.title}"
+
+    def get_item_price(self):
+        return "Half Portion" if self.is_half_portion else "Full Portion"
 
     def get_total_item_price(self):
         return self.quantity * self.item.price
@@ -82,9 +86,10 @@ class Order(models.Model):
     def get_total(self):
         total = 0
         for order_item in self.items.all():
-            total += order_item.get-final_price()
-        if self.coupon:
-            total -= self.coupon.amount
+            if order_item.is_half_portion:
+                total += order_item.item.min_price * order_item.quantity
+            else:
+                total += order_item.item.max_price * order_item.quantity
         return total
 
 
