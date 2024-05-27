@@ -23,11 +23,28 @@ def menu_view(request):
 class OrderSummaryView(View):
     def get(self, request, *args, **kwargs):
         try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            context = {
-                'object': order
-            }
-            return render(self.request, 'user_temp/order_summary.html', context)
+            if request.user.is_authenticated:
+                order = Order.objects.get(user=self.request.user, ordered=False)
+                context = {
+                    'object': order
+                }
+                return render(self.request, 'user_temp/order_summary.html', context)
+            else:
+                cart = request.session.get('cart', {})
+                order_items = []
+                total = 0
+                for slug, item in cart.items():
+                    total += float(item['price']) * item['quantity']
+                    order_items.append({
+                        'item': item,
+                        'quantity': item['quantity'],
+                        'total_price': float(item['price']) * item['quantity']
+                    })
+                context = {
+                    'order_items': order_items,
+                    'total': total
+                }
+                return render(self.request, 'user_temp/order_summary.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, 'You do not have an active order')
             return redirect("/")
