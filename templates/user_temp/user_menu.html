@@ -14,7 +14,7 @@
                         {% if cat == category %}
                             {% for item in items %}
                                 <li>{{ item.name }}
-                                    <a href="{{ item.get_add_to_cart_url }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">Add to Cart - {{ item.max_price }}</a>
+                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">View Details</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
@@ -25,11 +25,94 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="hidden fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50" id="itemModal">
+    <div class="bg-white p-8 max-w-sm mx-auto rounded-lg absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeModal">&times;</button>
+        <h2 class="text-xl font-bold mb-4" id="modalTitle">Item Details</h2>
+        <p>Menu Item: <span id="itemName"></span></p>
+        <div id="halfPortionSection" class="my-4 hidden">
+            <label class="block mb-2">Half Portion:</label>
+            <div class="flex items-center">
+                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</button>
+                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="1">
+                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>
+            </div>
+            <p>Price: $<span id="halfPrice"></span></p>
+        </div>
+        <div class="my-4">
+            <label class="block mb-2">Full Portion:</label>
+            <div class="flex items-center">
+                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseFullQty">-</button>
+                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="1">
+                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseFullQty">+</button>
+            </div>
+            <p>Price: $<span id="fullPrice"></span></p>
+        </div>
+        <div class="flex justify-end">
+            <a href="#" id="addToCartLink" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add to Cart</a>
+        </div>
+    </div>
+</div>
+
 <script>
     document.querySelectorAll('.category-toggle').forEach(button => {
         button.addEventListener('click', () => {
             button.nextElementSibling.classList.toggle('hidden');
         });
     });
+
+    const itemModal = document.getElementById('itemModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const itemName = document.getElementById('itemName');
+    const halfPortionSection = document.getElementById('halfPortionSection');
+    const halfQuantity = document.getElementById('halfQuantity');
+    const fullQuantity = document.getElementById('fullQuantity');
+    const halfPrice = document.getElementById('halfPrice');
+    const fullPrice = document.getElementById('fullPrice');
+    const addToCartLink = document.getElementById('addToCartLink');
+
+    document.querySelectorAll('.max-price-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const itemData = button.dataset;
+            itemName.textContent = itemData.item;
+            fullPrice.textContent = itemData.maxPrice;
+            addToCartLink.href = `/user/add-to-cart/${itemData.slug}/`;
+
+            if (itemData.minPrice !== 'None') {
+                halfPrice.textContent = itemData.minPrice;
+                halfPortionSection.classList.remove('hidden');
+            } else {
+                halfPortionSection.classList.add('hidden');
+            }
+
+            itemModal.classList.remove('hidden');
+        });
+    });
+
+    closeModalButton.addEventListener('click', () => {
+        itemModal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === itemModal) {
+            itemModal.classList.add('hidden');
+        }
+    });
+
+    const adjustQuantity = (inputId, increment) => {
+        const input = document.getElementById(inputId);
+        let value = parseInt(input.value, 10);
+        value = isNaN(value) ? 1 : value;
+        value = increment ? value + 1 : value - 1;
+        if (value < 1) value = 1;
+        input.value = value;
+    };
+
+    document.getElementById('increaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', true));
+    document.getElementById('decreaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', false));
+    document.getElementById('increaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', true));
+    document.getElementById('decreaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', false));
 </script>
 {% endblock %}

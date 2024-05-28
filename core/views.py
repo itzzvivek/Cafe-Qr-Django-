@@ -109,7 +109,7 @@ def remove_from_cart(request, slug):
         # check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
             order_item = OrderItem.objects.filter(
-                item=-item,
+                item=item,
                 user=request.user,
                 ordered=False
             )[0]
@@ -145,7 +145,7 @@ def remove_single_item_from_cart(request, slug):
                 order_item.save()
             else:
                 order.items.remove(order_item)
-            message.info(request, "This item was removed from your cart.")
+            messages.info(request, "This item was removed from your cart.")
             return redirect("core:order-summary")
         else:
             messages.info(request, "This item was not in your cart")
