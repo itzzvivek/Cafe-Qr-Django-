@@ -14,7 +14,7 @@
                         {% if cat == category %}
                             {% for item in items %}
                                 <li>{{ item.name }}
-                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">View Details</button>
+                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">{{ item.max_price }}</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
@@ -23,6 +23,9 @@
             </div>
             {% endfor %}
         </div>
+    </div>
+    <div class="button item-center">
+        <a href="{% url 'core:order-summary' %}" class="bg-green-500 text-white rounded-lg p-2 w-full text-center fixed">Check Items</a>
     </div>
 </div>
 
@@ -35,18 +38,18 @@
         <div id="halfPortionSection" class="my-4 hidden">
             <label class="block mb-2">Half Portion:</label>
             <div class="flex items-center">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</button>
-                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="1">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>
+                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</a>
+                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="0">
+                <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</a>
             </div>
             <p>Price: $<span id="halfPrice"></span></p>
         </div>
         <div class="my-4">
             <label class="block mb-2">Full Portion:</label>
             <div class="flex items-center">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseFullQty">-</button>
-                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="1">
-                <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseFullQty">+</button>
+                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseFullQty">-</a>
+                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="0">
+                <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseFullQty">+</a>
             </div>
             <p>Price: $<span id="fullPrice"></span></p>
         </div>
@@ -67,10 +70,10 @@
     const closeModalButton = document.getElementById('closeModal');
     const itemName = document.getElementById('itemName');
     const halfPortionSection = document.getElementById('halfPortionSection');
-    const halfQuantity = document.getElementById('halfQuantity');
-    const fullQuantity = document.getElementById('fullQuantity');
-    const halfPrice = document.getElementById('halfPrice');
-    const fullPrice = document.getElementById('fullPrice');
+    // const halfQuantity = document.getElementById('halfQuantity');
+    // const fullQuantity = document.getElementById('fullQuantity');
+    // const halfPrice = document.getElementById('halfPrice');
+    // const fullPrice = document.getElementById('fullPrice');
     const addToCartLink = document.getElementById('addToCartLink');
 
     document.querySelectorAll('.max-price-btn').forEach(button => {
@@ -110,9 +113,9 @@
         input.value = value;
     };
 
-    document.getElementById('increaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', true));
-    document.getElementById('decreaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', false));
-    document.getElementById('increaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', true));
-    document.getElementById('decreaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', false));
+    // document.getElementById('increaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', true));
+    // document.getElementById('decreaseHalfQty').addEventListener('click', () => adjustQuantity('halfQuantity', false));
+    // document.getElementById('increaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', true));
+    // document.getElementById('decreaseFullQty').addEventListener('click', () => adjustQuantity('fullQuantity', false));
 </script>
 {% endblock %}

@@ -69,18 +69,18 @@ def add_to_cart(request, slug):
                 order_item.quantity += 1
                 order_item.save()
                 messages.info(request, "This item quantity was updated.")
-                return redirect("core:order-summary")
+                return redirect("core:menu")
             else:
                 order.items.add(order_item)
                 messages.info(request, "This item was added to your cart.")
-                return redirect("core:order-summary")
+                return redirect("core:menu")
         else:
             ordered_date = timezone.now()
             order = Order.objects.create(
                 user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
             messages.info(request, "This item was added to your cart. ")
-            return redirect("core:order-summary")
+            return redirect("core:menu")
     else:
         cart = request.session.get('cart', {})
         portion_key = 'half' if is_half_portion else 'full'
@@ -95,7 +95,7 @@ def add_to_cart(request, slug):
         cart[slug] = cart_item
         request.session['cart'] = cart
     messages.info(request, "This item was added to your cart.")
-    return redirect("core:order-summary")
+    return redirect("core:menu")
 
 
 def remove_from_cart(request, slug):
