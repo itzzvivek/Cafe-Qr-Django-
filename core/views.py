@@ -20,7 +20,7 @@ def menu_view(request):
     return render(request, 'user_temp/user_menu.html', context)
 
 
-class OrderSummaryView(View):
+class CartView(View):
     def get(self, request, *args, **kwargs):
         try:
             if request.user.is_authenticated:
@@ -28,7 +28,7 @@ class OrderSummaryView(View):
                 context = {
                     'object': order
                 }
-                return render(self.request, 'user_temp/order_summary.html', context)
+                return render(self.request, 'user_temp/cart.html', context)
             else:
                 cart = request.session.get('cart', {})
                 order_items = []
@@ -45,7 +45,7 @@ class OrderSummaryView(View):
                     'order_items': order_items,
                     'total': total
                 }
-                return render(self.request, 'user_temp/order_summary.html', context)
+                return render(self.request, 'user_temp/cart.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, 'You do not have an active order')
             return redirect("/")
@@ -74,18 +74,18 @@ def add_to_cart(request, slug):
                 order_item.quantity += 1
                 order_item.save()
                 messages.info(request, "This item quantity was updated.")
-                return redirect("core:order-summary")
+                return redirect("core:cart")
             else:
                 order.items.add(order_item)
                 messages.info(request, "This item was added to your cart.")
-                return redirect("core:order-summary")
+                return redirect("core:cart")
         else:
             ordered_date = timezone.now()
             order = Order.objects.create(
                 user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
             messages.info(request, "This item was added to your cart. ")
-            return redirect("core:order-summary")
+            return redirect("core:cart")
     else:
         cart = request.session.get('cart', {})
         portion_key = 'half' if is_half_portion else 'full'
@@ -100,7 +100,7 @@ def add_to_cart(request, slug):
         cart[slug] = cart_item
         request.session['cart'] = cart
     messages.info(request, "This item was added to your cart.")
-    return redirect("core:order-summary")
+    return redirect("core:cart")
 
 
 def remove_from_cart(request, slug):
@@ -121,7 +121,7 @@ def remove_from_cart(request, slug):
             order.items.remove(order_item)
             order_item.delete()
             messages.info(request, "This item was removed from your cart.")
-            return redirect("core:order-summary")
+            return redirect("core:cart")
         else:
             messages.info(request, "This item was not in your cart")
             return redirect("core:menu", slug=slug)
@@ -151,12 +151,14 @@ def remove_single_item_from_cart(request, slug):
             else:
                 order.items.remove(order_item)
             messages.info(request, "This item was removed from your cart.")
-            return redirect("core:order-summary")
+            return redirect("core:cart")
         else:
             messages.info(request, "This item was not in your cart")
-            return redirect("core:order-summary")
+            return redirect("core:cart")
     else:
         messages.info(request, "You do not have an active order")
         return redirect("core:menu", slug=slug)
 
 
+def order_details(request):
+    pass
