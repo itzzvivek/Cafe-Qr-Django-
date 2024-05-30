@@ -115,6 +115,11 @@
         const portion = halfPortionSection.classList.contains('hidden') ? 'full' : 'half';
         const quantity = portion === 'half' ? halfQuantity.value : fullQuantity.value;
 
+        if (quantity <=0){
+            alert('Please add quantity of item');
+            return;
+        }
+
         fetch(`/user/add-to-cart/${currentSlug}/?portion=${portion}&quantity=${quantity}`, {
             method: 'GET',
             headers: {
@@ -131,6 +136,8 @@
     });
 
     closeModalButton.addEventListener('click', () => {
+        halfQuantity.value = 0;
+        fullQuantity.value = 0;
         itemModal.classList.add('hidden');
     });
 </script>

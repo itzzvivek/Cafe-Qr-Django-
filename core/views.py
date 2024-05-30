@@ -54,6 +54,11 @@ class OrderSummaryView(View):
 def add_to_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
     is_half_portion = request.GET.get('portion') == 'half'
+    quantity = int(request.GET.get('quantity', 1))
+
+    if quantity <= 0:
+        messages.warning(request, 'Quantity must be greater than zero')
+
     if request.user.is_authenticated:
         order_item, created = OrderItem.objects.get_or_create(
             item=item,
@@ -69,18 +74,18 @@ def add_to_cart(request, slug):
                 order_item.quantity += 1
                 order_item.save()
                 messages.info(request, "This item quantity was updated.")
-                return redirect("core:menu")
+                return redirect("core:order-summary")
             else:
                 order.items.add(order_item)
                 messages.info(request, "This item was added to your cart.")
-                return redirect("core:menu")
+                return redirect("core:order-summary")
         else:
             ordered_date = timezone.now()
             order = Order.objects.create(
                 user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
             messages.info(request, "This item was added to your cart. ")
-            return redirect("core:menu")
+            return redirect("core:order-summary")
     else:
         cart = request.session.get('cart', {})
         portion_key = 'half' if is_half_portion else 'full'
@@ -95,7 +100,7 @@ def add_to_cart(request, slug):
         cart[slug] = cart_item
         request.session['cart'] = cart
     messages.info(request, "This item was added to your cart.")
-    return redirect("core:menu")
+    return redirect("core:order-summary")
 
 
 def remove_from_cart(request, slug):
