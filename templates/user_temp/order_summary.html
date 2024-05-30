@@ -22,8 +22,6 @@
                                 {% endif %}
                             </div>
                             <div class="flex items-center">
-                                <!-- Debugging Output -->
-                                <span>Slug: {{ order_item.item.slug }}</span>
                                 <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
                                 <span class="px-4">{{ order_item.quantity }}</span>
                                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
@@ -57,8 +55,6 @@
                                 {% endif %}
                             </div>
                             <div class="flex items-center">
-                                <!-- Debugging Output -->
-                                <span>Slug: {{ order_item.item.slug }}</span>
                                 <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
                                 <span class="px-4">{{ order_item.quantity }}</span>
                                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
