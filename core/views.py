@@ -163,8 +163,37 @@ def remove_single_item_from_cart(request, slug):
         return redirect("core:menu", slug=slug)
 
 
-def order_details(request):
-    pass
+class OrderDetailsView(View):
+    def get(self, request, *args, **kwargs):
+        order_details = request.sesion.get('order_details', {})
+        try:
+            if request.user.is_authenticated:
+                order = Order.objects.get(user=self.request.user, ordered=False)
+                context = {
+                    'object': order,
+                    'order_details': order_details
+                }
+            else:
+                cart = request.session.get('cart', {})
+                order_items = []
+                total = 0
+                for key, item in cart.items():
+                    total += float(item['price']) * item['quantity']
+                    order_items.append({
+                        'item': item,
+                        'quantity': item['quantity'],
+                        'total_price': float(item['price']) * float(item['quantity']),
+                        'is_half_portion': item['is_half_portion']
+                    })
+                context = {
+                    'order_items': order_items,
+                    'total': total,
+                    'order_details': order_details
+                }
+            return render(request, 'user_temp/order_details.html', context)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "You do not have an active order")
+            return redirect("/")
 
 
 @csrf_exempt

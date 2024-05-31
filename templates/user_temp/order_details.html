@@ -1,4 +1,78 @@
 {% extends 'base.html' %}
-{% block content%}
-<h1>Order Details</h1>
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Order Details</h1>
+    <div class="w-full mb-8">
+        <!-- Order List -->
+        <div class="w-full">
+            <h2 class="text-2xl font-bold mb-4">Your Orders:</h2>
+            {% if object %}
+                <ul>
+                    {% for order_item in object.items.all %}
+                        <li class="flex items-center justify-between mb-4">
+                            <div>
+                                {{ order_item.item.name }} -
+                                {% if order_item.is_half_portion %}
+                                    Half Portion - Price: ${{ order_item.item.min_price }}
+                                {% else %}
+                                    Full Portion - Price: ${{ order_item.item.max_price }}
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                Total: $
+                                {% if order_item.is_half_portion %}
+                                    {{ order_item.quantity|multiply:order_item.item.min_price }}
+                                {% else %}
+                                    {{ order_item.quantity|multiply:order_item.item.max_price }}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <hr class="my-4">
+                <p class="text-lg font-bold">Total: ${{ object.get_total }}</p>
+            {% elif order_items %}
+                <ul>
+                    {% for order_item in order_items %}
+                        <li class="flex items-center justify-between mb-4">
+                            <div>
+                                {{ order_item.item.name }} -
+                                {% if order_item.is_half_portion %}
+                                    Half Portion - Price: ${{ order_item.price }}
+                                {% else %}
+                                    Full Portion - Price: ${{ order_item.price }}
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                Total: $
+                                {% if order_item.is_half_portion %}
+                                    {{ order_item.quantity|multiply:order_item.item.min_price }}
+                                {% else %}
+                                    {{ order_item.quantity|multiply:order_item.item.max_price }}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <hr class="my-4">
+                <p class="text-lg font-bold">Total: ${{ total }}</p>
+            {% else %}
+                <p>You do not have any items in your cart.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="w-full mb-8">
+        <!-- Order Details -->
+        <h2 class="text-2xl font-bold mb-4">Order Details:</h2>
+        <p><strong>Name:</strong> {{ order_details.name }}</p>
+        <p><strong>Email:</strong> {{ order_details.email }}</p>
+        <p><strong>Phone:</strong> {{ order_details.phone }}</p>
+        <p><strong>Table Number:</strong> {{ order_details.table }}</p>
+        <div class="mt-4">
+            <a href="{% url 'core:make-payment' %}" class="btn bg-blue-500 text-white p-2 rounded-lg">Make Payment</a>
+            <a href="{% url 'core:cash-on-delivery' %}" class="btn bg-green-500 text-white p-2 rounded-lg">Cash on Delivery</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
