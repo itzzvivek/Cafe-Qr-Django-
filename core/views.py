@@ -3,8 +3,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
 from django.views.generic import ListView, DetailView, View
+import json
 
 
 def menu_view(request):
@@ -162,3 +165,19 @@ def remove_single_item_from_cart(request, slug):
 
 def order_details(request):
     pass
+
+
+@csrf_exempt
+def update_order_status(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        status = data.get('status')
+        try:
+            order = Order.Objects.get(id=order_id)
+            order.status = status
+            order.save()
+            return JsonResponse({'success': True})
+        except Order.DoesNotExist:
+            return jsonResponse({'success': False, 'error': 'Order not found'})
+    return JsonResponse({'success': True, 'error': 'Invalid request method'})
