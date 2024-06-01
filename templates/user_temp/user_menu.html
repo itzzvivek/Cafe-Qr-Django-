@@ -14,7 +14,7 @@
                         {% if cat == category %}
                             {% for item in items %}
                                 <li>{{ item.name }}
-                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">{{ item.max_price }}</button>
+                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">${{ item.max_price }}</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
@@ -39,7 +39,7 @@
             <label class="block mb-2">Half Portion:</label>
             <div class="flex items-center">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseHalfQty">-</button>
-                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="0">
+                <input type="number" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="0">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>
             </div>
             <p>Price: $<span id="halfPrice"></span></p>
@@ -48,7 +48,7 @@
             <label class="block mb-2">Full Portion:</label>
             <div class="flex items-center">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-l-lg" id="decreaseFullQty">-</button>
-                <input type="text" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="0">
+                <input type="number" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="0">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseFullQty">+</button>
             </div>
             <p>Price: $<span id="fullPrice"></span></p>
@@ -112,27 +112,37 @@
 
     addToCartButton.addEventListener('click', (event) => {
         event.preventDefault();
-        const portion = halfPortionSection.classList.contains('hidden') ? 'full' : 'half';
-        const quantity = portion === 'half' ? halfQuantity.value : fullQuantity.value;
+        const halfPortionQty = parseInt(halfQuantity.value);
+        const fullPortionQty = parseInt(fullQuantity.value);
 
-        if (quantity <=0){
-            alert('Please add quantity of item');
+        if (halfPortionQty <= 0 && fullPortionQty <= 0) {
+            alert('Please add at least one portion.');
             return;
         }
 
-        fetch(`/user/add-to-cart/${currentSlug}/?portion=${portion}&quantity=${quantity}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                alert('Item added to cart successfully');
-                itemModal.classList.add('hidden');
-            } else {
-                console.error('Failed to add item to cart');
-            }
-        });
+        const addPortionToCart = (portion, quantity) => {
+            fetch(`/user/add-to-cart/${currentSlug}/?portion=${portion}&quantity=${quantity}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    alert('Item added to cart successfully');
+                    itemModal.classList.add('hidden');
+                } else {
+                    console.error('Failed to add item to cart');
+                }
+            });
+        };
+
+        if (halfPortionQty > 0) {
+            addPortionToCart('half', halfPortionQty);
+        }
+
+        if (fullPortionQty > 0) {
+            addPortionToCart('full', fullPortionQty);
+        }
     });
 
     closeModalButton.addEventListener('click', () => {
