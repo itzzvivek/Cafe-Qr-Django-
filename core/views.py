@@ -54,31 +54,62 @@ class CartView(View):
             return redirect("/")
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            messages.warning(self.request, 'You are not logged in')
-            return redirect("/")
+        # if not request.user.is_authenticated:
+        #     messages.warning(self.request, 'You are not logged in')
+        #     return redirect("/")
 
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         table = request.POST.get('table')
 
-        if not all([name, email, phone]):
+        if not all([name, phone, table]):
             messages.warning(self.request, 'Please fill all the fields')
-            return redirect("/")
+            return redirect("core:cart")
 
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            order.customer_name = name
-            order.customer_email = email
-            order.customer_phone = phone
-            order.customer_table = table
-            order.save()
-            messages.success(self.request, 'Order has been successfully created')
-            return redirect("/")
-        except ObjectDoesNotExist:
-            messages.warning(self.request, 'You do not have an active order')
-            return redirect("/")
+        if request.user.is_authenticated:
+            try:
+                order = Order.objects.get(user=self.request.user, ordered=False)
+                order.customer_name = name
+                order.customer_email = email
+                order.customer_phone = phone
+                order.customer_table = table
+                order.save()
+                messages.success(self.request, 'Order has been successfully created')
+                return redirect("core:order-details", pk=order.pk)
+            except ObjectDoesNotExist:
+                messages.warning(self.request, 'You do not have an active order')
+                return redirect("core:cart")
+
+        else:
+            cart = request.session.get('cart', {})
+            if not cart:
+                messages.warning(request, "Your cart is empty")
+                return redirect("core:cart")
+
+            order = Order.objects.create(
+                cutomer_name=name,
+                cutomer_phone=phone,
+                cutomer_table=table,
+                customer_email=email,
+                ordered=True,
+                ordered_date=timezone.now()
+            )
+
+            for key, item in cart.items():
+                menu_item = MenuItem.objects.get(slug=keu.split("_")[0])
+                is_half_portion = item["is_half_portion"]
+                quantity = item["quantity"]
+                OrderItem.objects.create(
+                    item=menu_item,
+                    order=orderm,
+                    quantity=quantity,
+                    is_half_portion=is_half_portion
+                )
+
+            request.session['cart'] = cart
+            messages.success(self.request, 'Order has been successfully (guest user)')
+            return redirect("core:order-details", pk=order.pk)
 
 
 def add_to_cart(request, slug):
@@ -192,7 +223,7 @@ def remove_single_item_from_cart(request, slug):
 
 class OrderDetailsView(View):
     def get(self, request, *args, **kwargs):
-        order_details = request.sesion.get('order_details', {})
+        order_details = request.session.get('order_details', {})
         try:
             if request.user.is_authenticated:
                 order = Order.objects.get(user=self.request.user, ordered=False)
