@@ -53,6 +53,33 @@ class CartView(View):
             messages.warning(self.request, 'You do not have an active order')
             return redirect("/")
 
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(self.request, 'You are not logged in')
+            return redirect("/")
+
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        table = request.POST.get('table')
+
+        if not all([name, email, phone]):
+            messages.warning(self.request, 'Please fill all the fields')
+            return redirect("/")
+
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            order.customer_name = name
+            order.customer_email = email
+            order.customer_phone = phone
+            order.customer_table = table
+            order.save()
+            messages.success(self.request, 'Order has been successfully created')
+            return redirect("/")
+        except ObjectDoesNotExist:
+            messages.warning(self.request, 'You do not have an active order')
+            return redirect("/")
+
 
 def add_to_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
