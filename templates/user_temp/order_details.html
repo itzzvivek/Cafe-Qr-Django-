@@ -3,11 +3,10 @@
 
 {% block content %}
 <div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold text-center mb-8">Your Cart</h1>
+    <h1 class="text-3xl font-bold text-center mb-8">Order Details</h1>
     <div class="w-full mb-8">
-        <!-- Order List -->
         <div class="w-full">
-            <h2 class="text-2xl font-bold mb-4">Your Orders:</h2>
+            <h2 class="text-2xl font-bold mb-4">Items in Your Order:</h2>
             {% if object %}
                 <ul>
                     {% for order_item in object.items.all %}
@@ -20,10 +19,8 @@
                                     Full Portion - Price: ${{ order_item.item.max_price }}
                                 {% endif %}
                             </div>
-                            <div class="flex items-center">
-                                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
-                                <span class="px-4">{{ order_item.quantity }}</span>
-                                <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
+                            <div>
+                                Quantity: {{ order_item.quantity }}
                             </div>
                             <div class="ml-4">
                                 Total: $
@@ -32,9 +29,6 @@
                                 {% else %}
                                     {{ order_item.quantity|multiply:order_item.item.max_price }}
                                 {% endif %}
-                            </div>
-                            <div class="ml-4">
-                                <a href="{% url 'core:remove-from-cart' order_item.item.slug %}" class="btn btn-danger">Remove</a>
                             </div>
                         </li>
                     {% endfor %}
@@ -46,28 +40,23 @@
                     {% for order_item in order_items %}
                         <li class="flex items-center justify-between mb-4">
                             <div>
-                                {{ order_item.item.name }} -
+                                {{ order_item.name }} -
                                 {% if order_item.is_half_portion %}
                                     Half Portion - Price: ${{ order_item.price }}
                                 {% else %}
                                     Full Portion - Price: ${{ order_item.price }}
                                 {% endif %}
                             </div>
-                            <div class="flex items-center">
-                                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
-                                <span class="px-4">{{ order_item.quantity }}</span>
-                                <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
+                            <div>
+                                Quantity: {{ order_item.quantity }}
                             </div>
                             <div class="ml-4">
                                 Total: $
                                 {% if order_item.is_half_portion %}
-                                    {{ order_item.quantity|multiply:order_item.item.min_price }}
+                                    {{ order_item.quantity|multiply:order_item.price }}
                                 {% else %}
-                                    {{ order_item.quantity|multiply:order_item.item.max_price }}
+                                    {{ order_item.quantity|multiply:order_item.price }}
                                 {% endif %}
-                            </div>
-                            <div class="ml-4">
-                                <a href="{% url 'core:remove-from-cart' order_item.item.slug %}" class="btn btn-danger">Remove</a>
                             </div>
                         </li>
                     {% endfor %}
@@ -75,25 +64,24 @@
                 <hr class="my-4">
                 <p class="text-lg font-bold">Total: ${{ total }}</p>
             {% else %}
-                <p>You do not have any items in your cart.</p>
+                <p>You do not have any items in your order.</p>
             {% endif %}
         </div>
     </div>
     <div class="w-full mb-8">
-        <!-- Order Form -->
-        <h2 class="text-2xl font-bold mb-4">Place Your Order:</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" ><br><br>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" ><br><br>
-            <label for="phone">Phone Number:</label>
-            <input type="text" id="phone" name="phone" ><br><br>
-            <label for="table">Table Number:</label>
-            <input type="text" id="table" name="table" ><br><br>
-            <a href="{% url 'core:order-details' %}"><button type="submit" class="btn bg-green-500 text-white p-2 rounded-lg">Place Order</button></a>
-        </form>
+        <h2 class="text-2xl font-bold mb-4">Your Information:</h2>
+        {% if order_details %}
+            <p>Name: {{ order_details.name }}</p>
+            <p>Email: {{ order_details.email }}</p>
+            <p>Phone: {{ order_details.phone }}</p>
+            <p>Table Number: {{ order_details.table }}</p>
+        {% else %}
+            <p>Order details are not available.</p>
+        {% endif %}
+    </div>
+    <div class="w-full mb-8">
+        <h2 class="text-2xl font-bold mb-4">Make Payment:</h2>
+        <button class="btn bg-blue-500 text-white p-2 rounded-lg">Pay Now</button>
     </div>
 </div>
 {% endblock %}

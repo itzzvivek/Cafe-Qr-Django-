@@ -54,10 +54,6 @@ class CartView(View):
             return redirect("/")
 
     def post(self, request, *args, **kwargs):
-        # if not request.user.is_authenticated:
-        #     messages.warning(self.request, 'You are not logged in')
-        #     return redirect("/")
-
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
@@ -66,6 +62,14 @@ class CartView(View):
         if not all([name, phone, table]):
             messages.warning(self.request, 'Please fill all the fields')
             return redirect("core:cart")
+
+        order_details = {
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'table': table
+        }
+        request.session['order_details'] = order_details
 
         if request.user.is_authenticated:
             try:
@@ -80,7 +84,6 @@ class CartView(View):
             except ObjectDoesNotExist:
                 messages.warning(self.request, 'You do not have an active order')
                 return redirect("core:cart")
-
         else:
             cart = request.session.get('cart', {})
             if not cart:
@@ -88,27 +91,27 @@ class CartView(View):
                 return redirect("core:cart")
 
             order = Order.objects.create(
-                cutomer_name=name,
-                cutomer_phone=phone,
-                cutomer_table=table,
+                customer_name=name,
+                customer_phone=phone,
+                customer_table=table,
                 customer_email=email,
                 ordered=True,
                 ordered_date=timezone.now()
             )
 
             for key, item in cart.items():
-                menu_item = MenuItem.objects.get(slug=keu.split("_")[0])
+                menu_item = MenuItem.objects.get(slug=key.split("_")[0])
                 is_half_portion = item["is_half_portion"]
                 quantity = item["quantity"]
                 OrderItem.objects.create(
                     item=menu_item,
-                    order=orderm,
+                    order=order,
                     quantity=quantity,
                     is_half_portion=is_half_portion
                 )
 
-            request.session['cart'] = cart
-            messages.success(self.request, 'Order has been successfully (guest user)')
+            request.session['cart'] = {}
+            messages.success(self.request, 'Order has been successfully created (guest user)')
             return redirect("core:order-details", pk=order.pk)
 
 
@@ -222,11 +225,11 @@ def remove_single_item_from_cart(request, slug):
 
 
 class OrderDetailsView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, pk, *args, **kwargs):
         order_details = request.session.get('order_details', {})
         try:
             if request.user.is_authenticated:
-                order = Order.objects.get(user=self.request.user, ordered=False)
+                order = Order.objects.get(pk=pk, user=self.request.user, ordered=False)
                 context = {
                     'object': order,
                     'order_details': order_details
@@ -238,8 +241,9 @@ class OrderDetailsView(View):
                 for key, item in cart.items():
                     total += float(item['price']) * item['quantity']
                     order_items.append({
-                        'item': item,
+                        'item': item['name'],
                         'quantity': item['quantity'],
+                        'price': item['price'],
                         'total_price': float(item['price']) * float(item['quantity']),
                         'is_half_portion': item['is_half_portion']
                     })
