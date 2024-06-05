@@ -66,6 +66,7 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=False)
     customer_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -94,7 +95,12 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
-    pass
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=False, null=True)
+    amount = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user
 
 
 class Coupon(models.Model):
