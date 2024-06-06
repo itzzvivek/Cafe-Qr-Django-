@@ -79,9 +79,8 @@
             <p>Order details are not available.</p>
         {% endif %}
     </div>
-    <div class="w-full mb-8">
-        <h2 class="text-2xl font-bold mb-4">Make Payment:</h2>
-        <button class="btn bg-blue-500 text-white p-2 rounded-lg">Pay Now</button>
+    <div class="flex justify-center mt-8">
+        <a href="{% url 'core:payment' %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</a>
     </div>
 </div>
 {% endblock %}

@@ -1,3 +1,7 @@
+import qrcode
+import io
+import json
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
@@ -7,7 +11,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
 from django.views.generic import ListView, DetailView, View
-import json
 
 
 def menu_view(request):
@@ -258,6 +261,24 @@ class OrderDetailsView(View):
             return redirect("/")
 
 
+def payment(request):
+    return render(request, 'user_temp/payments.html')
+
+
+class GenerateQRCodeView(view):
+    def get(self, request, pk, *args, **kwargs):
+        order = get_object_or_404(Order, pk=pk, ordered=False)
+        total = order.get_total()
+
+        qr_data = f"order ID: {order.pk}\nTotal Amount: ${total}"
+        qr = qrcode.make(qr_data)
+        buffer = io.BytesIO()
+        qr.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        return HttpResponse(buffer, content_type="image/png")
+
+
 @csrf_exempt
 def update_order_status(request):
     if request.method == 'POST':
@@ -272,3 +293,5 @@ def update_order_status(request):
         except Order.DoesNotExist:
             return jsonResponse({'success': False, 'error': 'Order not found'})
     return JsonResponse({'success': True, 'error': 'Invalid request method'})
+
+

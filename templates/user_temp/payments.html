@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="container mx-auto py-8">
+            <h1 class="text-3xl font-bold text-center mb-8">Payment Methods</h1>
+            <div class="w-full">
+                <p class="text-xl font-semibold mb-4">Total Amount: ${{ total }}</p>
+                <div class="flex flex-col">
+                    <a href="#" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
+                    <a href="#" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with PhonePe</a>
+                    <a href="#" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
+                    <button onclick="showQRCode()" class="bg-purple-500 text-white font=semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with QR Code</button>
+                </div>
+                 <div id="qrCodeSection" class="hidden text-center">
+                    <img id="qrCodeImage" src="" alt="QR Code">
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-center mt-4">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</button>
+        </div>
+    </form>
+</div>
+<script>
+    function showQRCode() {
+        const qrCodeSection = document.getElementById('qrCodeSection');
+        const qrCodeImage = document.getElementById('qrCodeImage');
+        qrCodeImage.src = `{% url 'generate-qr-code' pk=order.pk %}`;
+        qrCodeSection.classList.remove('hidden');
+    }
+</script>
+{% endblock%}
