@@ -66,14 +66,13 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
-    order_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=False)
+    order_id = models.AutoField(primary_key=True, unique=True, editable=False)
     customer_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(max_length=245)
     table_number = models.IntegerField(default=False)
     message = models.TextField()
-    items = models.ManyToManyField(OrderItem)
+    items = models.ManyToManyField('OrderItem')
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)

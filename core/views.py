@@ -265,7 +265,7 @@ def payment(request):
     return render(request, 'user_temp/payments.html')
 
 
-class GenerateQRCodeView(view):
+class GenerateQRCodeView(View):
     def get(self, request, pk, *args, **kwargs):
         order = get_object_or_404(Order, pk=pk, ordered=False)
         total = order.get_total()
