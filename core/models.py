@@ -67,6 +67,7 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True, unique=True, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     customer_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(max_length=245)
@@ -94,6 +95,7 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
+    payment_charge_id = models.CharField(max_length=50)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=False, null=True)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)

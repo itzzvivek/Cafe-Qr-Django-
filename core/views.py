@@ -291,7 +291,7 @@ def update_order_status(request):
             order.save()
             return JsonResponse({'success': True})
         except Order.DoesNotExist:
-            return jsonResponse({'success': False, 'error': 'Order not found'})
+            return JsonResponse({'success': False, 'error': 'Order not found'})
     return JsonResponse({'success': True, 'error': 'Invalid request method'})
 
 
