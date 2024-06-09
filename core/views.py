@@ -295,3 +295,13 @@ def update_order_status(request):
     return JsonResponse({'success': True, 'error': 'Invalid request method'})
 
 
+class ThankYouView(View):
+    def get(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, pk=order_id, ordered=True)
+        context = {
+            'order_id': order_id,
+            'total': order.get_total()
+        }
+        return render(request, 'user_temp/thank_you.html', context)
+
+

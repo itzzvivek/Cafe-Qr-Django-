@@ -8,6 +8,7 @@ from .views import (menu_view,
                     update_order_status,
                     payment,
                     GenerateQRCodeView,
+                    ThankYouView
                     )
 
 app_name = 'core'
@@ -21,5 +22,7 @@ urlpatterns = [
     path('order-details/<int:pk>', OrderDetailsView.as_view(), name='order-details'),
     path('update-order-status/', update_order_status, name='update-order-status'),
     path('payment/', payment, name='payment'),
-    path('GenerateQRCode/', GenerateQRCodeView.as_view(), name='GenerateQRCode'),
+
+    path('GenerateQRCode/<int:order_id>/', GenerateQRCodeView.as_view(), name='generateqrcode'),
+    path('thankyou/', ThankYouView.as_view, name='thankyou')
 ]
