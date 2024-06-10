@@ -268,13 +268,27 @@ class PaymentMethodsView(View):
             'order_id': order_id,
             'total': order.get_total()
         }
-        return render(request, 'user_temp/payments.html')
+        return render(request, 'user_temp/payments.html', context)
 
     def post(self, request, order_id, *args, **kwargs):
-        order = get_object_or_404(Order, pk=order_id, ordered=False)
-        payment_method = request.POST.get('payment_method')
+        payment_data = json.loads(request.body)
 
-        return redirect('thankyou', order_id=order_id)
+        success = True
+
+        if success:
+            order = get_object_or_404(Order, order_id=order_id, ordered=False)
+            payment = Payment.objects.create(
+                user=request.user,
+                amount=order.get_total(),
+                timestamp=timezone.now(),
+            )
+            order.payment = payment
+            order.ordered = True
+            order.save()
+
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False})
 
 
 class GenerateQRCodeView(View):

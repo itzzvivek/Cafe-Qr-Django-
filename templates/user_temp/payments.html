@@ -12,7 +12,7 @@
                 <div class="flex flex-col">
                     <a href="#" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
                     <a href="#" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with PhonePe</a>
-                    <a href="#" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
+                    <button onclick="onGooglePaymentButtonClicked()" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</button>
                     <button onclick="showQRCode()" class="bg-purple-500 text-white font=semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with QR Code</button>
                 </div>
                  <div id="qrCodeSection" class="hidden text-center">
@@ -32,5 +32,71 @@
         qrCodeImage.src = `{% url 'generate-qr-code' pk=order.pk %}`;
         qrCodeSection.classList.remove('hidden');
     }
+    
+    // Google Pay Integration
+    
+    function onGooglePayLoaded(){
+        const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+        
+        const button = paymentsClient.createButton({
+            onclick: onGooglePaymentButtonClicked
+        });
+        document.getElementById('google-pay-container').appendchild(button);
+    }
+    
+    function getGooglePaymentDataConfiguration(){
+        return {
+            marchantId: "your-merchent-id",
+            paymentMethodTokenizationParameters:{
+                tokenization: 'PAYMENT_GATEWAY',
+                parameter : {
+                    'gateway': 'example',
+                    'gatewayMerchantId': 'exampleGatewayMerchantId'
+                }
+            },
+            allowedPaymentmethods: ['CARD', 'UPI', 'TOKENIZED_CARD'],
+            cardRequirements: {
+                allowedCardNetworks: ['AMEX', 'DISCOVER', 'JCB', 'MASTERCARD', 'VISA'],
+                billingAddressRequired: true
+            },
+            phoneNumberRequired:true,
+            emailRequired: true,
+            shippingAddressRequired: false
+        };
+    }
+    
+    function onGooglePaymentButtonClicked(){
+        const paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST'});
+        paymentsClient.loadPaymentData(getGooglePaymentDataConfiguration()).then(function(paymentData){
+            processPayment(paymentData)
+        }).catch(function(err){
+            console.error('Error processing payment', err);
+        });
+    }
+    
+    function processPayment(paymentData){
+        fetch("{% url 'payment' order.order_id %}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X.CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                token: paymentData.paymentMethodData.tokenizationData.token
+            })
+        }).then(function(response){
+            return response.json();
+        }).then(function(data){
+            if (data.success){
+                window.location.href ="{% url 'thankyou' order.order_id %}"; 
+            } else{
+                alert("Payment failed. Please try again.")
+            }
+        }).catch(function(error){
+            console.error("Error": error);
+        });
+    }
+    
 </script>
+    <script async="https://pay.google.com/gp/p/js/pay.js", onload="onGooglePayLoaded()"></script>
 {% endblock%}
