@@ -261,8 +261,20 @@ class OrderDetailsView(View):
             return redirect("/")
 
 
-def payment(request):
-    return render(request, 'user_temp/payments.html')
+class PaymentMethodsView(View):
+    def get(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, pk=order_id, ordered=False)
+        context = {
+            'order_id': order_id,
+            'total': order.get_total()
+        }
+        return render(request, 'user_temp/payments.html')
+
+    def post(self, request, order_id, *args, **kwargs):
+        order = get_object_or_404(Order, pk=order_id, ordered=False)
+        payment_method = request.POST.get('payment_method')
+
+        return redirect('thankyou', order_id=order_id)
 
 
 class GenerateQRCodeView(View):
