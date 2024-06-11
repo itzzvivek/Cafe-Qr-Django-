@@ -32,18 +32,18 @@
         qrCodeImage.src = `{% url 'generate-qr-code' pk=order.pk %}`;
         qrCodeSection.classList.remove('hidden');
     }
-    
+
     // Google Pay Integration
-    
+
     function onGooglePayLoaded(){
         const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-        
+
         const button = paymentsClient.createButton({
             onclick: onGooglePaymentButtonClicked
         });
         document.getElementById('google-pay-container').appendchild(button);
     }
-    
+
     function getGooglePaymentDataConfiguration(){
         return {
             marchantId: "your-merchent-id",
@@ -57,14 +57,14 @@
             allowedPaymentmethods: ['CARD', 'UPI', 'TOKENIZED_CARD'],
             cardRequirements: {
                 allowedCardNetworks: ['AMEX', 'DISCOVER', 'JCB', 'MASTERCARD', 'VISA'],
-                billingAddressRequired: true
+                billingAddressRequired: false
             },
             phoneNumberRequired:true,
             emailRequired: true,
             shippingAddressRequired: false
         };
     }
-    
+
     function onGooglePaymentButtonClicked(){
         const paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST'});
         paymentsClient.loadPaymentData(getGooglePaymentDataConfiguration()).then(function(paymentData){
@@ -73,7 +73,7 @@
             console.error('Error processing payment', err);
         });
     }
-    
+
     function processPayment(paymentData){
         fetch("{% url 'payment' order.order_id %}", {
             method: "POST",
@@ -88,7 +88,7 @@
             return response.json();
         }).then(function(data){
             if (data.success){
-                window.location.href ="{% url 'thankyou' order.order_id %}"; 
+                window.location.href ="{% url 'thankyou' order.order_id %}";
             } else{
                 alert("Payment failed. Please try again.")
             }
@@ -96,7 +96,7 @@
             console.error("Error": error);
         });
     }
-    
+
 </script>
     <script async="https://pay.google.com/gp/p/js/pay.js", onload="onGooglePayLoaded()"></script>
 {% endblock%}

@@ -1,6 +1,8 @@
 import qrcode
 import io
 import json
+import razorpay
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +13,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
 from django.views.generic import ListView, DetailView, View
+
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
 
 
 def menu_view(request):
@@ -264,31 +268,33 @@ class OrderDetailsView(View):
 class PaymentMethodsView(View):
     def get(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, pk=order_id, ordered=False)
+        total = order.get_total()
         context = {
             'order_id': order_id,
-            'total': order.get_total()
+            'total': total
         }
         return render(request, 'user_temp/payments.html', context)
 
     def post(self, request, order_id, *args, **kwargs):
-        payment_data = json.loads(request.body)
+        order = get_object_or_404(Order, order_id=order_id, ordered=False)
+        total_amount = order.get_total() * 100
 
-        success = True
+        razorpay_order = razorpay_client.order.create({
+            "amount": total_amount,
+            "currency": "INR",
+            "payment_capture": "1"
+        })
 
-        if success:
-            order = get_object_or_404(Order, order_id=order_id, ordered=False)
-            payment = Payment.objects.create(
-                user=request.user,
-                amount=order.get_total(),
-                timestamp=timezone.now(),
-            )
-            order.payment = payment
-            order.ordered = True
-            order.save()
+        context = {
+            "razorpay_order_id": razorpay_order['id'],
+            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+            "amount": total_amount,
+            "name": request.user.username,
+            "email": request.user.email,
+            "contact": request.user.profile.phone_number,
+        }
 
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False})
+        return JsonResponse(context)
 
 
 class GenerateQRCodeView(View):
