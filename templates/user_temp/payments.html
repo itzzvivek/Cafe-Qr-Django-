@@ -12,7 +12,8 @@
                 <div class="flex flex-col">
                     <a href="#" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
                     <a href="#" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with PhonePe</a>
-                    <button onclick="onGooglePaymentButtonClicked()" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</button>
+                    <a href="#" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
+                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
                     <button onclick="showQRCode()" class="bg-purple-500 text-white font=semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with QR Code</button>
                 </div>
                  <div id="qrCodeSection" class="hidden text-center">
@@ -33,70 +34,46 @@
         qrCodeSection.classList.remove('hidden');
     }
 
-    // Google Pay Integration
+    document.getElementById('razorpay-button').addEventListener('click', function (e){
+        e.preventDefault();
+        processPayment();
+    });
 
-    function onGooglePayLoaded(){
-        const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-
-        const button = paymentsClient.createButton({
-            onclick: onGooglePaymentButtonClicked
-        });
-        document.getElementById('google-pay-container').appendchild(button);
-    }
-
-    function getGooglePaymentDataConfiguration(){
-        return {
-            marchantId: "your-merchent-id",
-            paymentMethodTokenizationParameters:{
-                tokenization: 'PAYMENT_GATEWAY',
-                parameter : {
-                    'gateway': 'example',
-                    'gatewayMerchantId': 'exampleGatewayMerchantId'
-                }
-            },
-            allowedPaymentmethods: ['CARD', 'UPI', 'TOKENIZED_CARD'],
-            cardRequirements: {
-                allowedCardNetworks: ['AMEX', 'DISCOVER', 'JCB', 'MASTERCARD', 'VISA'],
-                billingAddressRequired: false
-            },
-            phoneNumberRequired:true,
-            emailRequired: true,
-            shippingAddressRequired: false
-        };
-    }
-
-    function onGooglePaymentButtonClicked(){
-        const paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST'});
-        paymentsClient.loadPaymentData(getGooglePaymentDataConfiguration()).then(function(paymentData){
-            processPayment(paymentData)
-        }).catch(function(err){
-            console.error('Error processing payment', err);
-        });
-    }
-
-    function processPayment(paymentData){
+    function processPayment(){
         fetch("{% url 'payment' order.order_id %}", {
-            method: "POST",
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X.CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                token: paymentData.paymentMethodData.tokenizationData.token
-            })
-        }).then(function(response){
-            return response.json();
-        }).then(function(data){
-            if (data.success){
-                window.location.href ="{% url 'thankyou' order.order_id %}";
-            } else{
-                alert("Payment failed. Please try again.")
+                'X-CSRFToken': `{{ csrf_token }}`
             }
-        }).catch(function(error){
-            console.error("Error": error);
-        });
+        })
+            .then(response => response.json())
+            .then(data => {
+                const options = {
+                    "key": data.razorpay_key_id,
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": data.name,
+                    "order_id": data.razorpay_order_id,
+                    "handler": function(response){
+                        alert("Payment Successful")
+                        // Redirect to thank you page or update order status
+                    },
+                    "prefill": {
+                        "name": data.name,
+                        "email": data.email,
+                        "contact": data.contact
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                const rzp1 = new Razorpay(optins):
+                rzp1.open();
+            })
+            .catch(error => console.error("Error:", error))
     }
-
+    
 </script>
-    <script async="https://pay.google.com/gp/p/js/pay.js", onload="onGooglePayLoaded()"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
 {% endblock%}
