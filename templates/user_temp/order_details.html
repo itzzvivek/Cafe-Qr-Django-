@@ -8,9 +8,9 @@
     <div class="w-full mb-8">
         <div class="w-full">
             <h2 class="text-2xl font-bold mb-4">Items in Your Order:</h2>
-            {% if object %}
+            {% if order.items.exists %}
                 <ul>
-                    {% for order_item in object.items.all %}
+                    {% for order_item in order.items.all %}
                         <li class="flex items-center justify-between mb-4">
                             <div>
                                 {{ order_item.item.name }} -
@@ -35,35 +35,7 @@
                     {% endfor %}
                 </ul>
                 <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ object.get_total }}</p>
-            {% elif order_items %}
-                <ul>
-                    {% for order_item in order_items %}
-                        <li class="flex items-center justify-between mb-4">
-                            <div>
-                                {{ order_item.name }} -
-                                {% if order_item.is_half_portion %}
-                                    Half Portion - Price: ${{ order_item.price }}
-                                {% else %}
-                                    Full Portion - Price: ${{ order_item.price }}
-                                {% endif %}
-                            </div>
-                            <div>
-                                Quantity: {{ order_item.quantity }}
-                            </div>
-                            <div class="ml-4">
-                                Total: $
-                                {% if order_item.is_half_portion %}
-                                    {{ order_item.quantity|multiply:order_item.price }}
-                                {% else %}
-                                    {{ order_item.quantity|multiply:order_item.price }}
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ total }}</p>
+                <p class="text-lg font-bold">Total: ${{ order.get_total }}</p>
             {% else %}
                 <p>You do not have any items in your order.</p>
             {% endif %}
@@ -81,7 +53,7 @@
         {% endif %}
     </div>
     <div class="flex justify-center mt-8">
-        <a href="{% url 'core:payment' %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</a>
+        <a href="{% url 'core:payment-method' order.order_id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</a>
     </div>
 </div>
 {% endblock %}

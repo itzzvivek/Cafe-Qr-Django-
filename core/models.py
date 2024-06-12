@@ -45,7 +45,7 @@ class OrderItem(models.Model):
     is_half_portion = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.title}"
+        return f"{self.quantity} of {self.item.name}"
 
     def get_item_price(self):
         return "Half Portion" if self.is_half_portion else "Full Portion"

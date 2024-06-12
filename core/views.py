@@ -238,7 +238,7 @@ class OrderDetailsView(View):
             if request.user.is_authenticated:
                 order = Order.objects.get(pk=pk, user=self.request.user, ordered=False)
                 context = {
-                    'object': order,
+                    'order': order,
                     'order_details': order_details
                 }
             else:
@@ -278,37 +278,25 @@ class PaymentMethodsView(View):
     def post(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, order_id=order_id, ordered=False)
         total_amount = order.get_total() * 100
+        currency = "INR"
 
         razorpay_order = razorpay_client.order.create({
-            "amount": total_amount,
-            "currency": "INR",
+            "amount": int(total_amount),
+            "currency": currency,
             "payment_capture": "1"
         })
 
         context = {
             "razorpay_order_id": razorpay_order['id'],
             "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-            "amount": total_amount,
+            "amount": float(total_amount),
             "name": request.user.username,
             "email": request.user.email,
             "contact": request.user.profile.phone_number,
+            # "callback_url": 'callback_url',
         }
 
         return JsonResponse(context)
-
-
-class GenerateQRCodeView(View):
-    def get(self, request, pk, *args, **kwargs):
-        order = get_object_or_404(Order, pk=pk, ordered=False)
-        total = order.get_total()
-
-        qr_data = f"order ID: {order.pk}\nTotal Amount: ${total}"
-        qr = qrcode.make(qr_data)
-        buffer = io.BytesIO()
-        qr.save(buffer, format="PNG")
-        buffer.seek(0)
-
-        return HttpResponse(buffer, content_type="image/png")
 
 
 @csrf_exempt
@@ -318,7 +306,7 @@ def update_order_status(request):
         order_id = data.get('order_id')
         status = data.get('status')
         try:
-            order = Order.Objects.get(id=order_id)
+            order = Order.objects.get(id=order_id)
             order.status = status
             order.save()
             return JsonResponse({'success': True})

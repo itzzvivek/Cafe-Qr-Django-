@@ -13,8 +13,7 @@
                     <a href="#" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
                     <a href="#" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with PhonePe</a>
                     <a href="#" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
-                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
-                    <button onclick="showQRCode()" class="bg-purple-500 text-white font=semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with QR Code</button>
+                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with RazorPay</a>
                 </div>
                  <div id="qrCodeSection" class="hidden text-center">
                     <img id="qrCodeImage" src="" alt="QR Code">
@@ -27,12 +26,6 @@
     </form>
 </div>
 <script>
-    function showQRCode() {
-        const qrCodeSection = document.getElementById('qrCodeSection');
-        const qrCodeImage = document.getElementById('qrCodeImage');
-        qrCodeImage.src = `{% url 'generate-qr-code' pk=order.pk %}`;
-        qrCodeSection.classList.remove('hidden');
-    }
 
     document.getElementById('razorpay-button').addEventListener('click', function (e){
         e.preventDefault();
@@ -40,7 +33,7 @@
     });
 
     function processPayment(){
-        fetch("{% url 'payment' order.order_id %}", {
+        fetch("{% url 'core:payment-method' order_id %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,10 +61,10 @@
                         "color": "#3399cc"
                     }
                 };
-                const rzp1 = new Razorpay(optins):
+                const rzp1 = new Razorpay(options);
                 rzp1.open();
             })
-            .catch(error => console.error("Error:", error))
+            .catch(error => console.error("Error:", error));
     }
     
 </script>
