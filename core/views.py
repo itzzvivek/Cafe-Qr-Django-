@@ -277,26 +277,34 @@ class PaymentMethodsView(View):
 
     def post(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, order_id=order_id, ordered=False)
-        total_amount = order.get_total() * 100
-        currency = "INR"
+        payment_method = request.POST.get("payment_method")
 
-        razorpay_order = razorpay_client.order.create({
-            "amount": int(total_amount),
-            "currency": currency,
-            "payment_capture": "1"
-        })
+        if payment_method == "cash":
+            order.ordered = True
+            order.save()
+            return JsonResponse({"redirect_url": '/thank-you'})
 
-        context = {
-            "razorpay_order_id": razorpay_order['id'],
-            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-            "amount": float(total_amount),
-            "name": request.user.username,
-            "email": request.user.email,
-            "contact": request.user.profile.phone_number,
-            # "callback_url": 'callback_url',
-        }
+        else:
+            total_amount = order.get_total() * 100
+            currency = "INR"
 
-        return JsonResponse(context)
+            razorpay_order = razorpay_client.order.create({
+                "amount": int(total_amount),
+                "currency": currency,
+                "payment_capture": "1"
+            })
+
+            context = {
+                "razorpay_order_id": razorpay_order['id'],
+                "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                "amount": float(total_amount),
+                "name": request.user.username,
+                "email": request.user.email,
+                # "contact": request.user.phone,
+                # "callback_url": 'callback_url',
+            }
+
+            return JsonResponse(context)
 
 
 @csrf_exempt

@@ -10,18 +10,13 @@
             <div class="w-full">
                 <p class="text-xl font-semibold mb-4">Total Amount: ${{ total }}</p>
                 <div class="flex flex-col">
-                    <a href="#" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
-                    <a href="#" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with PhonePe</a>
-                    <a href="#" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with Google Pay</a>
-                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with RazorPay</a>
+                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
+                    <a href="#" id="pay-cash-button" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay With Cash</a>
                 </div>
                  <div id="qrCodeSection" class="hidden text-center">
                     <img id="qrCodeImage" src="" alt="QR Code">
                 </div>
             </div>
-        </div>
-        <div class="flex justify-center mt-4">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</button>
         </div>
     </form>
 </div>
@@ -29,16 +24,24 @@
 
     document.getElementById('razorpay-button').addEventListener('click', function (e){
         e.preventDefault();
-        processPayment();
+        processPayment('razorpay');
     });
 
-    function processPayment(){
+    document.getElementById('pay-cash-button').addEventListener('click', function(e){
+        e.preventDefault();
+        processPayment('cash');
+    })
+
+
+
+    function processPayment(payment_method){
         fetch("{% url 'core:payment-method' order_id %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': `{{ csrf_token }}`
-            }
+            },
+            body: JSON.stringify({ payment_method: payment_method })
         })
             .then(response => response.json())
             .then(data => {
