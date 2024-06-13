@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold text-center mb-8">Thank You</h1>
-    <div class="w-full text-center">
-        <p class="text-xl font-semibold mb-4">Thank you, {{ order.customer_name }}!</p>
-        <p class="text-lg mb-4">Your order has been placed successfully.</p>
-        <p class="text-lg mb-4">Order Total: ${{ order.get_total }}</p>
-        <a href="{% url 'core:menu' %}" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg">Back to Menu</a>
-    </div>
+<div class="container mx-auto py-8 text-center">
+    <h1 class="text-3xl font-bold mb-8">Thank You for Your Order, {{ customer_name }}!</h1>
+    <p>Your order has been successfully created.</p>
+    <a href="{% url 'core:menu' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">Back to Home</a>
 </div>
-{% endblock content%}
+{% endblock %}

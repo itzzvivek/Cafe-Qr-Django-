@@ -7,7 +7,7 @@ from .views import (menu_view,
                     OrderDetailsView,
                     update_order_status,
                     PaymentMethodsView,
-                    ThankYouView
+                    thankyou
                     )
 
 app_name = 'core'
@@ -21,5 +21,5 @@ urlpatterns = [
     path('order-details/<int:pk>', OrderDetailsView.as_view(), name='order-details'),
     path('update-order-status/', update_order_status, name='update-order-status'),
     path('payment-method/<int:order_id>/', PaymentMethodsView.as_view(), name='payment-method'),
-    path('thankyou/<int:order_id>', ThankYouView.as_view, name='thankyou')
+    path('thank-you/', thankyou, name='thank-you')
 ]

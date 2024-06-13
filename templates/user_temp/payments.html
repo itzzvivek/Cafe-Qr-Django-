@@ -45,30 +45,35 @@
         })
             .then(response => response.json())
             .then(data => {
-                const options = {
-                    "key": data.razorpay_key_id,
-                    "amount": data.amount,
-                    "currency": "INR",
-                    "name": data.name,
-                    "order_id": data.razorpay_order_id,
-                    "handler": function(response){
-                        alert("Payment Successful")
-                        // Redirect to thank you page or update order status
-                    },
-                    "prefill": {
+                if (payment_method === 'cash'){
+                    alert("order created successfully.You will be redirected to the thankyou page");
+                    window.location.href = '{% url 'core:thank-you' %}'
+                }else {
+                    const options = {
+                        "key": data.razorpay_key_id,
+                        "amount": data.amount,
+                        "currency": "INR",
                         "name": data.name,
-                        "email": data.email,
-                        "contact": data.contact
-                    },
-                    "theme": {
-                        "color": "#3399cc"
+                        "order_id": data.razorpay_order_id,
+                        "handler": function (response) {
+                            alert("Payment Successful")
+                            // Redirect to thank you page or update order status
+                        },
+                        "prefill": {
+                            "name": data.name,
+                            "email": data.email,
+                            "contact": data.contact
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
                     }
-                };
-                const rzp1 = new Razorpay(options);
-                rzp1.open();
-            })
-            .catch(error => console.error("Error:", error));
-    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
     
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
