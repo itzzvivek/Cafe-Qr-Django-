@@ -278,11 +278,13 @@ class PaymentMethodsView(View):
     def post(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, order_id=order_id, ordered=False)
         payment_method = request.POST.get("payment_method")
+        customer_name = order.customer_name
 
         if payment_method == "cash":
+            request.session['customer_name'] = customer_name
             order.ordered = True
             order.save()
-            return JsonResponse({"redirect_url": '/thank-you'})
+            return JsonResponse({"redirect_url": '/thank-you'}, {"customer_name": customer_name})
 
         else:
             total_amount = order.get_total() * 100

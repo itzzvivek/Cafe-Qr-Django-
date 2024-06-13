@@ -56,8 +56,9 @@
                         "name": data.name,
                         "order_id": data.razorpay_order_id,
                         "handler": function (response) {
+                            sessionStorage.setItem('customer_name', data.customer_name);
                             alert("Payment Successful")
-                            // Redirect to thank you page or update order status
+                            window.location.href = '{% url 'thank-you' %}';
                         },
                         "prefill": {
                             "name": data.name,
@@ -69,6 +70,10 @@
                         }
                     };
                     const rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response){
+                        alert("Payment Failed. Please try again.")
+                        console.error("Payment Failed", response);
+                    });
                     rzp1.open();
                     }
                 })
