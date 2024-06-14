@@ -14,3 +14,9 @@ class Cafe(models.Model):
 
     def get_absolute_url(self):
         return reverse('cafe_menu', kwargs={'slug': self.slug})
+
+
+# model for generate link for the empty qr
+class QRCode (models.Model):
+    cafe = models.OneToOneField(Cafe, on_delete=models.CASCADE, null=True, blank=True)
+    code = models.CharField(max_length=255, unique=True)

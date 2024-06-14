@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Register Cafe</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+        </div>
+        <div class="form-group">
+            {{ form.address.label_tag }}
+            {{ form.address }}
+        </div>
+        <div class="form-group">
+            {{ form.slug.label_tag }}
+            {{ form.slug }}
+        </div>
+        <button type="submit" class="btn btn-primary">Register Cafe</button>
+    </form>
+    {% if qr_code_image %}
+        <div class="text-center mt-4">
+            <img src="data:image/png;base64,{{ qr_code_image }}" alt="QR Code">
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

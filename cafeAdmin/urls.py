@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import categories_view
+from .views import (register_cafe, CafeMenuView)
 
 app_name = "cafeAdmin"
 
 urlpatterns = [
-    path("", categories_view, name="index")
+    path("", CafeMenuView.as_view(), name="index"),
+    path("register-cafe/", register_cafe, name="register-cafe"),
 ]
