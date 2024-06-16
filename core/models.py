@@ -48,21 +48,21 @@ class OrderItem(models.Model):
         return f"{self.quantity} of {self.item.name}"
 
     def get_item_price(self):
-        return "Half Portion" if self.is_half_portion else "Full Portion"
+        return self.item.min_price if self.is_half_portion else self.item.max_price
 
     def get_total_item_price(self):
-        return self.quantity * self.item.price
+        return self.quantity * self.get_item_price()
 
     def get_total_discount_item_price(self):
-        return self.quantity * self.item.discount.price
+        if hasattr(self.item, 'discount_price'):
+            return self.quantity * self.item.discount_price
+        return self.get_total_item_price()
 
     def get_amount_saved(self):
         return self.get_total_item_price() - self.get_total_discount_item_price()
 
     def get_final_price(self):
-        if self.item.discount_price:
-            return self.get_total_discount_item_price()
-        return self.get_total_item_price()
+        return self.get_total_discount_item_price()
 
 
 class Order(models.Model):
@@ -73,7 +73,7 @@ class Order(models.Model):
     email = models.EmailField(max_length=245)
     table_number = models.IntegerField(default=False)
     message = models.TextField()
-    items = models.ManyToManyField('OrderItem')
+    items = models.ManyToManyField(OrderItem, related_name='orders')
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)

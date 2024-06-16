@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
 from django.views.generic import ListView, DetailView, View
+from cafeAdmin.models import Cafe
 
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
 

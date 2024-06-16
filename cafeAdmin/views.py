@@ -7,19 +7,20 @@ from django.shortcuts import get_object_or_404
 from .forms import CafeForm
 from .models import Cafe
 from django.views.generic import DetailView
-from core.models import Category, MenuItem
-from core.serializers import CategorySerializer, MenuItemSerializer
-from django.http import JsonResponse
-from rest_framework.parsers import JSONParser
 
 
 def register_cafe(request):
     if request.method == 'POST':
-            form = CafeForm(request.POST)
-            if form.is_valid():
-                cafe = form.save()
-                unique_url = request.build_absolute_uri(reverse('cafe_menu', kwargs={'slug': cafe.slug}))
-                qr_code_image = generate_qr_code(unique_url)
+        form = CafeForm(request.POST)
+        if form.is_valid():
+            cafe = form.save()
+            cafe.owner = request.user
+            unique_link = f"localhost:8000/cafe/{cafe.id}"
+            cafe.unique_link = unique_link
+            cafe.save()
+            qr_code = generate_qr_code(unique_link)
+            return render(request, 'cafeAdmin_temp/register_cafe.html',
+                          {'qr_code': qr_code})
     else:
         form = CafeForm()
     return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form}, {""})
