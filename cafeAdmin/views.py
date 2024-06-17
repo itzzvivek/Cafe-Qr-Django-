@@ -4,9 +4,13 @@ from io import BytesIO
 from django.urls import reverse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+
+from core.models import Category, MenuItem
 from .forms import CafeForm
 from .models import Cafe
 from django.views.generic import DetailView
+from .serializers import CategorySerializer, MenuItemSerializer
 
 
 def register_cafe(request):
@@ -47,3 +51,13 @@ class CafeMenuView(DetailView):
     model = Cafe
     template_name = 'cafe_menu.html',
     context_object_name = 'cafe'
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class MenuItemViewSet(viewsets.ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
