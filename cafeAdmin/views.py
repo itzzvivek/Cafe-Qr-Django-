@@ -19,7 +19,7 @@ def register_cafe(request):
         if form.is_valid():
             cafe = form.save()
             cafe.owner = request.user
-            unique_link = f"localhost:8000/cafe/{cafe.id}"
+            unique_link = f"localhost:8000/user/menu/{cafe.id}"
             cafe.unique_link = unique_link
             cafe.save()
             qr_code = generate_qr_code(unique_link)
