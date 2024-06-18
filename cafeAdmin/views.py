@@ -27,7 +27,7 @@ def register_cafe(request):
                           {'qr_code': qr_code})
     else:
         form = CafeForm()
-    return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form}, {""})
+    return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})
 
 
 def generate_qr_code(data):

@@ -5,24 +5,36 @@
     <h1 class="text-3xl font-bold text-center mb-8">Register Cafe</h1>
     <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-            {{ form.name.label_tag }}
+        <div class="form-group mb-4">
+            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.name.label }}</label>
             {{ form.name }}
+            {% if form.name.errors %}
+                <div class="text-red-500 text-sm">{{ form.name.errors }}</div>
+            {% endif %}
         </div>
-        <div class="form-group">
-            {{ form.address.label_tag }}
+        <div class="form-group mb-4">
+            <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.address.label }}</label>
             {{ form.address }}
+            {% if form.address.errors %}
+                <div class="text-red-500 text-sm">{{ form.address.errors }}</div>
+            {% endif %}
         </div>
-        <div class="form-group">
-            {{ form.slug.label_tag }}
+        <div class="form-group mb-4">
+            <label for="{{ form.slug.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.slug.label }}</label>
             {{ form.slug }}
+            {% if form.slug.errors %}
+                <div class="text-red-500 text-sm">{{ form.slug.errors }}</div>
+            {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Register Cafe</button>
+        <div class="text-center">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Register Cafe</button>
+        </div>
     </form>
-    {% if qr_code_image %}
+    {% if qr_code %}
         <div class="text-center mt-4">
-            <img src="data:image/png;base64,{{ qr_code_image }}" alt="QR Code">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="inline-block">
         </div>
     {% endif %}
 </div>
 {% endblock %}
+
