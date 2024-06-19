@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import register_cafe, CafeMenuView, CategoryViewSet, MenuItemViewSet
+from .views import register_cafe, CategoryViewSet, MenuItemViewSet
 
 app_name = "cafeAdmin"
 
@@ -10,6 +10,5 @@ router.register(r'menuitems', MenuItemViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path("", CafeMenuView.as_view(), name="index"),
     path("register-cafe/", register_cafe, name="register-cafe"),
 ]

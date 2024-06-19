@@ -46,7 +46,8 @@
     </form>
     {% if qr_code %}
         <div class="text-center mt-4">
-            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="inline-block">
+            <p>Your Cafe link : <a href="{{ form.instance.unique_link }}">{{ form.instance.unique.link }}</a></p>
+            <img src="data:image/png;base64, {{ qr_code_image }}" alt="QR Code" class="inline-block">
         </div>
     {% endif %}
 </div>

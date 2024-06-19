@@ -18,8 +18,8 @@ from cafeAdmin.models import Cafe
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
 
 
-def menu_view(request):
-    categories = Category.objects.all()
+def menu_view(request, cafe_id):
+    categories = Category.objects.filter(cafe_id=cafe_id)
     menu_items = []
     for category in categories:
         items = MenuItem.objects.filter(category=category)

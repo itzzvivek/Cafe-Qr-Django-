@@ -13,7 +13,7 @@ from .views import (menu_view,
 app_name = 'core'
 
 urlpatterns = [
-    path('menu/', menu_view, name='menu'),
+    path('menu/<int:cafe_id>', menu_view, name='menu'),
     path('cart/', CartView.as_view(), name='cart'),
     path('add-to-cart/<slug>/', add_to_cart, name='add-to-cart'),
     path('remove-single-item-from-cart/<slug>/', remove_single_item_from_cart, name='remove-single-item-from-cart'),

@@ -1,10 +1,8 @@
-import qrcode
-import base64
-from io import BytesIO
 from django.urls import reverse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from .utils import generate_qr_code
 
 from core.models import Category, MenuItem
 from .forms import CafeForm
@@ -19,7 +17,8 @@ def register_cafe(request):
         if form.is_valid():
             cafe = form.save()
             cafe.owner = request.user
-            unique_link = f"localhost:8000/user/menu/{cafe.id}"
+            cafe.save()
+            unique_link = request.build_absolute_uri(reverse('core:menu', args=[cafe.id]))
             cafe.unique_link = unique_link
             cafe.save()
             qr_code = generate_qr_code(unique_link)
@@ -28,29 +27,6 @@ def register_cafe(request):
     else:
         form = CafeForm()
     return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})
-
-
-def generate_qr_code(data):
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(data)
-    qr.make(fit=True)
-
-    img = qr.make_image(fill_color="black", back_color="white")
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    img_str = base64.b64encode(buffer.getvalue()).decode()
-    return img_str
-
-
-class CafeMenuView(DetailView):
-    model = Cafe
-    template_name = 'cafe_menu.html',
-    context_object_name = 'cafe'
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

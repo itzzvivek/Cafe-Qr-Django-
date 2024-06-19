@@ -7,6 +7,7 @@ class Cafe(models.Model):
     contact_number = models.CharField(max_length=15)
     email = models.EmailField(max_length=50, unique=True)
     address = models.TextField(max_length=50)
+    unique_link = models.URLField(blank=True, null=True)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
