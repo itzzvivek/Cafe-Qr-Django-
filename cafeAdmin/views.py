@@ -15,7 +15,7 @@ def register_cafe(request):
     if request.method == 'POST':
         form = CafeForm(request.POST)
         if form.is_valid():
-            cafe = form.save()
+            cafe = form.save(commit=False)
             cafe.owner = request.user
             cafe.save()
             unique_link = request.build_absolute_uri(reverse('core:menu', args=[cafe.id]))
@@ -23,7 +23,7 @@ def register_cafe(request):
             cafe.save()
             qr_code = generate_qr_code(unique_link)
             return render(request, 'cafeAdmin_temp/register_cafe.html',
-                          {'qr_code': qr_code})
+                          {'form': form, 'qr_code': qr_code})
     else:
         form = CafeForm()
     return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})

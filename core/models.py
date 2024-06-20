@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.shortcuts import reverse
+from cafeAdmin.models import Cafe
 
 
 class Category(models.Model):
@@ -11,6 +12,7 @@ class Category(models.Model):
 
 
 class MenuItem(models.Model):
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='menu_images', blank=True)
     max_price = models.DecimalField(max_digits=5, decimal_places=2)

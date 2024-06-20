@@ -1,8 +1,10 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 class Cafe(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
     name = models.CharField(max_length=50)
     contact_number = models.CharField(max_length=15)
     email = models.EmailField(max_length=50, unique=True)

@@ -58,7 +58,7 @@
                         "handler": function (response) {
                             sessionStorage.setItem('customer_name', data.customer_name);
                             alert("Payment Successful")
-                            window.location.href = '{% url 'thank-you' %}';
+                            window.location.href = '{% url 'core:thank-you' %}';
                         },
                         "prefill": {
                             "name": data.name,

@@ -1,14 +1,10 @@
-import qrcode
-import io
 import json
 import razorpay
 from django.conf import settings
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
@@ -19,14 +15,16 @@ razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZOR
 
 
 def menu_view(request, cafe_id):
-    categories = Category.objects.filter(cafe_id=cafe_id)
+    cafe = get_object_or_404(Cafe, id=cafe_id)
+    categories = Category.objects.all()
     menu_items = []
     for category in categories:
-        items = MenuItem.objects.filter(category=category)
+        items = MenuItem.objects.filter(category=category, cafe=cafe)
         menu_items.append((category, items))
     context = {
         'categories': categories,
-        'menu_items': menu_items
+        'menu_items': menu_items,
+        'cafe': cafe,
     }
     return render(request, 'user_temp/user_menu.html', context)
 
