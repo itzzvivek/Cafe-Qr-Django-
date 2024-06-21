@@ -324,8 +324,9 @@ def update_order_status(request):
     return JsonResponse({'success': True, 'error': 'Invalid request method'})
 
 
-def thankyou(request):
-    customer_name = request.session.get('name')
+def thankyou(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    customer_name = order.customer_name
     return render(request, 'user_temp/thank_you.html', {'customer_name': customer_name})
 
 

@@ -10,8 +10,8 @@
             <div class="w-full">
                 <p class="text-xl font-semibold mb-4">Total Amount: ${{ total }}</p>
                 <div class="flex flex-col">
-                    <a href="#" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</a>
-                    <a href="#" id="pay-cash-button" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay With Cash</a>
+                    <button href="" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</button>
+                    <button id="pay-cash-button" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay With Cash</button>
                 </div>
                  <div id="qrCodeSection" class="hidden text-center">
                     <img id="qrCodeImage" src="" alt="QR Code">
@@ -47,7 +47,7 @@
             .then(data => {
                 if (payment_method === 'cash'){
                     alert("order created successfully.You will be redirected to the thankyou page");
-                    window.location.href = '{% url 'core:thank-you' %}'
+                    window.location.href = 'user/thankyou/{{ order_id }}/'
                 }else {
                     const options = {
                         "key": data.razorpay_key_id,
@@ -58,7 +58,7 @@
                         "handler": function (response) {
                             sessionStorage.setItem('customer_name', data.customer_name);
                             alert("Payment Successful")
-                            window.location.href = '{% url 'core:thank-you' %}';
+                            window.location.href = 'user/thankyou/{{ order_id }}/';
                         },
                         "prefill": {
                             "name": data.name,
@@ -69,8 +69,8 @@
                             "color": "#3399cc"
                         }
                     };
-                    const rzp1 = new Razorpay(options);
                     rzp1.on('payment.failed', function (response){
+                    const rzp1 = new Razorpay(options);
                         alert("Payment Failed. Please try again.")
                         console.error("Payment Failed", response);
                     });

@@ -6,8 +6,6 @@ from .utils import generate_qr_code
 
 from core.models import Category, MenuItem
 from .forms import CafeForm
-from .models import Cafe
-from django.views.generic import DetailView
 from .serializers import CategorySerializer, MenuItemSerializer
 
 

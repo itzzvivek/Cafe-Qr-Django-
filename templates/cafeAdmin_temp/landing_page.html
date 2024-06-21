@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8 text-center">
+    <h1 class="text-3xl font-bold mb-8">Welcome, {{ user.email }}!</h1>
+    <div class="flex flex-col">
+        <a href="{% url 'cafeAdmin:manage_order' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Manage Orders</a>
+        <a href="{% url 'cafeAdmin:edit_menu' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Edit Menu and Categories</a>
+        <a href="{% url 'cafeAdmin:show_qr' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Show QR Code</a>
+    </div>
+</div>
+{% endblock %}

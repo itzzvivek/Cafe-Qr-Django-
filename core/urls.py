@@ -21,5 +21,5 @@ urlpatterns = [
     path('order-details/<int:pk>', OrderDetailsView.as_view(), name='order-details'),
     path('update-order-status/', update_order_status, name='update-order-status'),
     path('payment-method/<int:order_id>/', PaymentMethodsView.as_view(), name='payment-method'),
-    path('thank-you/', thankyou, name='thank-you')
+    path('thank-you/<int:order_id>', thankyou, name='thank-you')
 ]
