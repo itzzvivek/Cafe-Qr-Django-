@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from .utils import generate_qr_code
@@ -25,6 +26,26 @@ def register_cafe(request):
     else:
         form = CafeForm()
     return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})
+
+
+@login_required
+def welcome(request):
+    return render(request, 'cafeAdmin_temp/landing_page.html')
+
+
+@login_required
+def manage_orders(request):
+    return render(request, 'cafeAdmin_temp/order_list.html')
+
+
+@login_required
+def edit_menu(request):
+    return render(request, 'cafeAdmin_temp/edit_menu.html')
+
+
+@login_required
+def show_qr_code(request):
+    pass
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
