@@ -9,7 +9,7 @@ class CafeForm(forms.ModelForm):
 
     class Meta:
         model = Cafe
-        fields = ['name', 'contact_number', 'email', 'address', 'slug']
+        fields = ['cafe_name', 'contact_number', 'email', 'address', 'slug']
 
     def clean(self):
         cleaned_data = super().clean()

@@ -5,6 +5,7 @@ from cafeAdmin.models import Cafe
 
 
 class Category(models.Model):
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -17,7 +18,7 @@ class MenuItem(models.Model):
     image = models.ImageField(upload_to='menu_images', blank=True)
     max_price = models.DecimalField(max_digits=5, decimal_places=2)
     min_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    slug = models.SlugField(default="False")
+    slug = models.SlugField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=False, null=True)
 
     def __str__(self):
