@@ -16,7 +16,7 @@ razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZOR
 
 def menu_view(request, cafe_id):
     cafe = get_object_or_404(Cafe, id=cafe_id)
-    categories = Category.objects.all()
+    categories = Category.objects.filter(cafe=cafe)
     menu_items = []
     for category in categories:
         items = MenuItem.objects.filter(category=category, cafe=cafe)

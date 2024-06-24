@@ -5,8 +5,8 @@ from cafeAdmin.models import Cafe
 
 
 class Category(models.Model):
-    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
