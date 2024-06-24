@@ -61,7 +61,6 @@ class CartView(View):
 
     def post(self, request, *args, **kwargs):
         name = request.POST.get('name')
-        email = request.POST.get('email')
         phone = request.POST.get('phone')
         table = request.POST.get('table')
 
@@ -71,7 +70,6 @@ class CartView(View):
 
         order_details = {
             'name': name,
-            'email': email,
             'phone': phone,
             'table': table
         }
@@ -81,7 +79,6 @@ class CartView(View):
             try:
                 order = Order.objects.get(user=self.request.user, ordered=False)
                 order.customer_name = name
-                order.customer_email = email
                 order.customer_phone = phone
                 order.customer_table = table
                 order.save()
@@ -100,7 +97,6 @@ class CartView(View):
                 customer_name=name,
                 customer_phone=phone,
                 customer_table=table,
-                customer_email=email,
                 ordered=True,
                 ordered_date=timezone.now()
             )

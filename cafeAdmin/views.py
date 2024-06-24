@@ -32,12 +32,12 @@ def register_cafe(request):
                           {'form': form, 'qr_code': qr_code})
     else:
         form = CafeForm()
-    return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})
+    return render(request, 'cafeAdmin_temp/welcome.html', {'form': form})
 
 
 @login_required
 def welcome(request):
-    return render(request, 'cafeAdmin_temp/landing_page.html')
+    return render(request, 'cafeAdmin_temp/welcome.html')
 
 
 @login_required
