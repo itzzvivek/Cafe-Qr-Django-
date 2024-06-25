@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8 text-center">
+    <h1 class="text-3xl font-bold mb-8">{{ cafe.name }} QR Code</h1>
+    {% if cafe.qr_code %}
+        <img src="data:image/png;base64, {{ cafe.qr_code }}" alt="QR Code" class="inline-block">
+        <p class="mt-4"><a href="{{ cafe.unique_link }}" target="_blank">{{ cafe.unique_link }}</a></p>
+    {% else %}
+        <p>No QR code available for this cafe.</p>
+    {% endif %}
+</div>
+{% endblock %}

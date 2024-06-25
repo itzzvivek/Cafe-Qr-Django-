@@ -14,5 +14,5 @@ urlpatterns = [
     path("welcome/", welcome, name="welcome"),
     path("manage-orders/", manage_orders, name="manage-orders"),
     path("edit-menu/", edit_menu, name="edit-menu"),
-    path("show-qr-code/", show_qr_code, name="show-qr-code"),
+    path("show-qr-code/<int:id>/", show_qr_code, name="show-qr-code"),
 ]

@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from django.db import transaction
 
+from .models import Cafe
 from .utils import generate_qr_code
 from core.models import Category, MenuItem
 from .forms import CafeForm
@@ -28,6 +29,7 @@ def register_cafe(request):
             cafe.unique_link = unique_link
             cafe.save()
             qr_code = generate_qr_code(unique_link)
+            cafe.qr_code = qr_code
             return render(request, 'cafeAdmin_temp/register_cafe.html',
                           {'form': form, 'qr_code': qr_code})
     else:
@@ -51,8 +53,10 @@ def edit_menu(request):
 
 
 @login_required
-def show_qr_code(request):
-    pass
+def show_qr_code(request, cafe_id):
+    cafe = get_object_or_404(Cafe, id=cafe_id)
+    context = {'cafe': cafe}
+    return render(request, 'cafeAdmin_temp/show_qr_code.html', context)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
