@@ -6,7 +6,7 @@
     <div class="flex flex-col">
         <a href="{% url 'cafeAdmin:manage-orders' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Manage Orders</a>
         <a href="{% url 'cafeAdmin:edit-menu' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Edit Menu and Categories</a>
-        <a href="{% url 'cafeAdmin:show-qr-code' %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Show QR Code</a>
+        <a href="{% url 'cafeAdmin:show-qr-code' cafe_id %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">Show QR Code</a>
     </div>
 </div>
 {% endblock %}

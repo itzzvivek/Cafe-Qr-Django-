@@ -2,7 +2,7 @@ from django import forms
 from .models import Cafe
 
 
-class CafeForm(forms.ModelForm):
+class CafeRegisterForm(forms.ModelForm):
     email = forms.EmailField()
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
@@ -19,3 +19,6 @@ class CafeForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             self.add_error('password2', "Passwords do not match.")
         return cleaned_data
+
+
+
