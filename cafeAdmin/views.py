@@ -21,17 +21,11 @@ def register_cafe(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
             user = User.objects.create_user(username=email, email=email, password=password)
-
             cafe = form.save(commit=False)
             cafe.owner = user
             cafe.save()
-            unique_link = request.build_absolute_uri(reverse('core:menu', args=[cafe.id]))
-            cafe.unique_link = unique_link
-            qr_code = generate_qr_code(unique_link)
-            cafe.qr_code = qr_code
-            cafe.save()
             return render(request, 'cafeAdmin_temp/welcome.html',
-                          {'form': form, 'qr_code': qr_code, 'cafe_id': cafe.id})
+                          {'form': form, 'cafe_id': cafe.id})
     else:
         form = CafeRegisterForm()
     return render(request, 'cafeAdmin_temp/register_cafe.html', {'form': form})
@@ -80,6 +74,11 @@ def edit_menu(request):
 @login_required()
 def show_qr_code(request, cafe_id):
     cafe = get_object_or_404(Cafe, id=cafe_id)
+    unique_link = request.build_absolute_uri(reverse('core:menu', args=[cafe.id]))
+    cafe.unique_link = unique_link
+    qr_code = generate_qr_code(unique_link)
+    cafe.qr_code = qr_code
+    cafe.save()
     context = {'cafe': cafe}
     return render(request, 'cafeAdmin_temp/show_qr_code.html', context)
 

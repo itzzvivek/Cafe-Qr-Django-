@@ -11,6 +11,7 @@ class Cafe(models.Model):
     address = models.TextField(max_length=50)
     unique_link = models.URLField(blank=True, null=True)
     slug = models.SlugField(unique=True)
+    qr_code = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.cafe_name
