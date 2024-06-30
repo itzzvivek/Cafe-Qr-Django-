@@ -1,5 +1,6 @@
 from django import forms
 from .models import Cafe
+from core.models import Category, MenuItem
 
 
 class CafeRegisterForm(forms.ModelForm):
@@ -24,5 +25,31 @@ class CafeRegisterForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = 'name'
+
+    def __init__(self, *args, **kwargs):
+        cafe = kwargs.pop('cafe', None)
+        super(CategoryForm, self).__init__(*args, **kwargs)
+        if cafe:
+            self.fields['name'].queryset = Category.objects.filter(cafe=cafe)
+
+
+class MenuItemForm(forms.ModelForm):
+    class Meta:
+        model = MenuItem
+        fields = ['name', 'min_price', 'max_price', 'category']
+
+    def __init__(self, *args, **kwargs):
+        cafe= kwargs.pop('cafe', None)
+        super(MenuItemForm, self).__init__(*args, **kwargs)
+        if cafe:
+            self.fields['category'].queryset = MenuItem.objects.filter(cafe=cafe)
+
+
 
 

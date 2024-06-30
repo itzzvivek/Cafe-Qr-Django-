@@ -86,66 +86,6 @@ def show_qr_code(request, cafe_id):
 
 
 @login_required
-def edit_menu(request):
+def manage_menu_and_categories(request):
     cafe = get_object_or_404(Cafe, owner=request.user)
-    categories = Category.objects.filter(cafe=cafe)
-    menu_items = MenuItem.objects.filter(cafe=cafe)
 
-    context = {
-        'categories': categories,
-        'menu_items': menu_items,
-        'cafe': cafe,
-    }
-    return render(request, 'cafeAdmin_temp/edit_menu.html', context)
-
-
-@login_required
-def manage_category(request, category_id=None):
-    cafe = get_object_or_404(Cafe, owner=request.user)
-    if category_id:
-        category = get_object_or_404(Category, id=category_id, cafe=cafe)
-    else:
-        category = None
-
-    if request.method == 'POST':
-        form = CategoryForm(request.POST, instance=category)
-        if form.is_valid():
-            new_category = form.save(commit=False)
-            new_category.cafe = cafe
-            new_category.save()
-            return redirect('cafeAdmin:edit-menu')
-    else:
-        form = CategoryForm(instance=category)
-
-    context = {'form': form, 'is_update': category_id is not None}
-    return render(request, 'cafeAdmin_temp/manage_category.html', context)
-
-
-@login_required
-def delete_category(request, category_id):
-    cafe = get_object_or_404(Cafe, owner=request.user)
-    category = get_object_or_404(Category, id=category_id, cafe=cafe)
-    category.delete()
-    return redirect('cafeAdmin:edit-menu')
-
-
-@login_required
-def manage_menu_item(request, menu_item_id=None):
-    cafe = get_object_or_404(Cafe, owner=request.user)
-    if menu_item_id:
-        menu_item = get_object_or_404(MenuItem, id=menu_item_id, cafe=cafe)
-    else:
-        menu_item = None
-
-    if request.method == 'POST':
-        form = MenuItemForm(request.POST, instance=menu_item)
-        if form.is_valid():
-            new_menu_item = form.save(commit=False)
-            new_menu_item.cafe = cafe
-            new_menu_item.save()
-            return redirect('cafeAdmin:edit-menu')
-    else:
-        form = MenuItemForm(instance=menu_item)
-
-    context = {'form': form, 'is_update': menu_item_id is not None}
-    return render(request, 'cafeAdmin_temp/manage_menu_item.html', context)
