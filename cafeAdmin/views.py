@@ -89,44 +89,45 @@ def show_qr_code(request, cafe_id):
 def manage_menu(request):
     cafe = get_object_or_404(Cafe, owner=request.user)
 
-    category_form = CategoryForm(request.POST or None)
-
-    menu_item_form = MenuItemForm(request.POST or None)
-
     if request.method == 'POST':
-        if 'save_category' in request.POST and category_form.is_valid():
-            category = category_form.save(commit=False)
-            category.cafe = cafe
-            category.save()
-            messages.success(request, "Category saved successfully")
-            return redirect('cafeAdmin:manage-menu')
+        if 'save_category' in request.POST:
+            category_form = CategoryForm(request.POST)
+            if category_form.is_valid():
+                category = category_form.save(commit=False)
+                category.cafe = cafe
+                category.save()
+                messages.success(request, 'Category saved successfully.')
+                return redirect('cafeAdmin:manage-menu')
 
-        if 'save_menu_item' in request.POST and menu_item_form.is_valid():
-            menu_item = menu_item_form.save(commit=False)
-            menu_item.cafe = cafe
-            menu_item.save()
-            messages.success(request, "Menu item saved successfully.")
-            return redirect('cafeAdmin:manage-menu')
+        if 'save_menu_item' in request.POST:
+            menu_item_form = MenuItemForm(request.POST, cafe=cafe)
+            if menu_item_form.is_valid():
+                menu_item = menu_item_form.save(commit=False)
+                menu_item.cafe = cafe
+                menu_item.save()
+                messages.success(request, 'Menu item saved successfully.')
+                return redirect('cafeAdmin:manage-menu')
 
         if 'delete_category' in request.POST:
-            category_name = request.POST.get('delete_category')
-            category = get_object_or_404(Category, name=category_name, cafe=cafe)
+            category_id = request.POST.get('delete_category')
+            category = get_object_or_404(Category, id=category_id, cafe=cafe)
             category.delete()
-            messages.success(request, "Category deleted successfully.")
+            messages.success(request, 'Category deleted successfully.')
             return redirect('cafeAdmin:manage-menu')
 
         if 'delete_menu_item' in request.POST:
-            menu_item_name = request.POST.get('delete_menu_item')
-            menu_item = get_object_or_404(MenuItem, name=menu_item_name, cafe=cafe)
+            menu_item_id = request.POST.get('delete_menu_item')
+            menu_item = get_object_or_404(MenuItem, id=menu_item_id, cafe=cafe)
             menu_item.delete()
             messages.success(request, 'Menu item deleted successfully.')
             return redirect('cafeAdmin:manage-menu')
+
     else:
         category_form = CategoryForm()
-        menu_item_form = MenuItemForm()
+        menu_item_form = MenuItemForm(cafe=cafe)
 
     categories = Category.objects.filter(cafe=cafe)
-    menu_items = MenuItem.objects.filter(cafe=cafe)
+    menu_items = MenuItem.objects.filter(cafe=cafe).exclude(min_price=0)
 
     context = {
         'categories': categories,

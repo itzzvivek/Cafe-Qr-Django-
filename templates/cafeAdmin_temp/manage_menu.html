@@ -48,7 +48,11 @@
         <ul class="mt-4">
             {% for menu_item in menu_items %}
                 <li class="mb-2">
-                    {{ menu_item.name }} - {{ menu_item.category.name }} - ${{ menu_item.price }}
+                    {{ menu_item.name }} - {{ menu_item.category.name }} -
+                    {% if menu_item.min_price > 0 %}
+                        ${{ menu_item.min_price }} -
+                    {% endif %}
+                    ${{ menu_item.max_price }}
                     <form method="post" class="inline-block">
                         {% csrf_token %}
                         <input type="hidden" name="delete_menu_item" value="{{ menu_item.id }}">
@@ -72,7 +76,11 @@
             <h3 class="text-xl font-bold mt-4 mb-2">Menu Items</h3>
             <ul>
                 {% for menu_item in menu_items %}
-                    <li>{{ menu_item.name }} - {{ menu_item.category.name }} - ${{ menu_item.price }}</li>
+                    <li>{{ menu_item.name }} - {{ menu_item.category.name }} -
+                    {% if menu_item.min_price > 0 %}
+                        ${{ menu_item.min_price }} -
+                    {% endif %}
+                    ${{ menu_item.max_price }}</li>
                 {% endfor %}
             </ul>
         </div>

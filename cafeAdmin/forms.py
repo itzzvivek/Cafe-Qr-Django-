@@ -48,7 +48,7 @@ class MenuItemForm(forms.ModelForm):
         cafe = kwargs.pop('cafe', None)
         super(MenuItemForm, self).__init__(*args, **kwargs)
         if cafe:
-            self.fields['name'].queryset = MenuItem.objects.filter(cafe=cafe)
+            self.fields['category'].queryset = Category.objects.filter(cafe=cafe)
 
 
 
