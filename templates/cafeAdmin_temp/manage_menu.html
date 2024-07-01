@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Categories and Menu Items</h1>
+
+    <!-- Success and Error Messages -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="text-white py-2 px-4 mb-2 rounded {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Categories Section -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Categories</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ category_form.as_p }}
+            <button type="submit" name="save_category" class="bg-blue-500 text-white font-bold py-2 px-4 rounded">Save Category</button>
+        </form>
+        <ul class="mt-4">
+            {% for category in categories %}
+                <li class="mb-2">
+                    {{ category.name }}
+                    <form method="post" class="inline-block">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_category" value="{{ category.id }}">
+                        <button type="submit" class="bg-red-500 text-white font-bold py-1 px-2 rounded">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Menu Items Section -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Menu Items</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ menu_item_form.as_p }}
+            <button type="submit" name="save_menu_item" class="bg-blue-500 text-white font-bold py-2 px-4 rounded">Save Menu Item</button>
+        </form>
+        <ul class="mt-4">
+            {% for menu_item in menu_items %}
+                <li class="mb-2">
+                    {{ menu_item.name }} - {{ menu_item.category.name }} - ${{ menu_item.price }}
+                    <form method="post" class="inline-block">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_menu_item" value="{{ menu_item.id }}">
+                        <button type="submit" class="bg-red-500 text-white font-bold py-1 px-2 rounded">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Preview Section -->
+    <div>
+        <h2 class="text-2xl font-bold mb-4">Preview</h2>
+        <div class="preview">
+            <h3 class="text-xl font-bold mb-2">Categories</h3>
+            <ul>
+                {% for category in categories %}
+                    <li>{{ category.name }}</li>
+                {% endfor %}
+            </ul>
+            <h3 class="text-xl font-bold mt-4 mb-2">Menu Items</h3>
+            <ul>
+                {% for menu_item in menu_items %}
+                    <li>{{ menu_item.name }} - {{ menu_item.category.name }} - ${{ menu_item.price }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -30,7 +30,7 @@ class LoginForm(forms.Form):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = 'name'
+        fields = ['name']
 
     def __init__(self, *args, **kwargs):
         cafe = kwargs.pop('cafe', None)
@@ -45,10 +45,10 @@ class MenuItemForm(forms.ModelForm):
         fields = ['name', 'min_price', 'max_price', 'category']
 
     def __init__(self, *args, **kwargs):
-        cafe= kwargs.pop('cafe', None)
+        cafe = kwargs.pop('cafe', None)
         super(MenuItemForm, self).__init__(*args, **kwargs)
         if cafe:
-            self.fields['category'].queryset = MenuItem.objects.filter(cafe=cafe)
+            self.fields['name'].queryset = MenuItem.objects.filter(cafe=cafe)
 
 
 
