@@ -321,8 +321,12 @@ def update_order_status(request):
 
 
 def thankyou(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    customer_name = order.customer_name
-    return render(request, 'user_temp/thank_you.html', {'customer_name': customer_name})
+    order = get_object_or_404(Order, order_id=order_id)
+    cafe = order.cafe
+    context = {
+        'customer_name': order.customer_name,
+        'cafe': cafe,
+    }
+    return render(request, 'user_temp/thank_you.html', {'context': context})
 
 

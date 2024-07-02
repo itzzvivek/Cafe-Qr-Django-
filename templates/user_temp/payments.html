@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <div class="container mx-auto py-8">
     <form method="post" action="">
@@ -10,31 +9,29 @@
             <div class="w-full">
                 <p class="text-xl font-semibold mb-4">Total Amount: ${{ total }}</p>
                 <div class="flex flex-col">
-                    <button href="" id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</button>
+                    <button id="razorpay-button" class="bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay with UPI</button>
                     <button id="pay-cash-button" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-4 text-center">Pay With Cash</button>
                 </div>
-                 <div id="qrCodeSection" class="hidden text-center">
+                <div id="qrCodeSection" class="hidden text-center">
                     <img id="qrCodeImage" src="" alt="QR Code">
                 </div>
             </div>
         </div>
     </form>
 </div>
-<script>
 
-    document.getElementById('razorpay-button').addEventListener('click', function (e){
+<script>
+    document.getElementById('razorpay-button').addEventListener('click', function (e) {
         e.preventDefault();
         processPayment('razorpay');
     });
 
-    document.getElementById('pay-cash-button').addEventListener('click', function(e){
+    document.getElementById('pay-cash-button').addEventListener('click', function(e) {
         e.preventDefault();
         processPayment('cash');
-    })
+    });
 
-
-
-    function processPayment(payment_method){
+    function processPayment(payment_method) {
         fetch("{% url 'core:payment-method' order_id %}", {
             method: 'POST',
             headers: {
@@ -43,43 +40,42 @@
             },
             body: JSON.stringify({ payment_method: payment_method })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (payment_method === 'cash'){
-                    alert("order created successfully.You will be redirected to the thankyou page");
-                    window.location.href = 'user/thankyou/{{ order_id }}/'
-                }else {
-                    const options = {
-                        "key": data.razorpay_key_id,
-                        "amount": data.amount,
-                        "currency": "INR",
+        .then(response => response.json())
+        .then(data => {
+            if (payment_method === 'cash') {
+                alert("Order created successfully. You will be redirected to the thank you page.");
+                window.location.href = '{% url "core:thank-you" order_id %}';
+            } else {
+                const options = {
+                    "key": data.razorpay_key_id,
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": data.name,
+                    "order_id": data.razorpay_order_id,
+                    "handler": function (response) {
+                        sessionStorage.setItem('customer_name', data.customer_name);
+                        alert("Payment Successful");
+                        window.location.href = '{% url "core:thank-you" order_id %}';
+                    },
+                    "prefill": {
                         "name": data.name,
-                        "order_id": data.razorpay_order_id,
-                        "handler": function (response) {
-                            sessionStorage.setItem('customer_name', data.customer_name);
-                            alert("Payment Successful")
-                            window.location.href = 'user/thankyou/{{ order_id }}/';
-                        },
-                        "prefill": {
-                            "name": data.name,
-                            "email": data.email,
-                            "contact": data.contact
-                        },
-                        "theme": {
-                            "color": "#3399cc"
-                        }
-                    };
-                    rzp1.on('payment.failed', function (response){
-                    const rzp1 = new Razorpay(options);
-                        alert("Payment Failed. Please try again.")
-                        console.error("Payment Failed", response);
-                    });
-                    rzp1.open();
+                        "email": data.email,
+                        "contact": data.contact
+                    },
+                    "theme": {
+                        "color": "#3399cc"
                     }
-                })
-                .catch(error => console.error("Error:", error));
-        }
-    
+                };
+                const rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (response) {
+                    alert("Payment Failed. Please try again.");
+                    console.error("Payment Failed", response);
+                });
+                rzp1.open();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
 </script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
-{% endblock%}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
