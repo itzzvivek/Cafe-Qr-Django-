@@ -9,7 +9,7 @@ from django.contrib import messages
 
 from .models import Cafe
 from .utils import generate_qr_code
-from core.models import Category, MenuItem
+from core.models import Category, MenuItem, Order
 from .forms import CafeRegisterForm, LoginForm, CategoryForm, MenuItemForm
 
 
@@ -65,12 +65,21 @@ def welcome(request):
 
 @login_required()
 def manage_orders(request):
-    return render(request, 'cafeAdmin_temp/order_list.html')
+    cafe = get_object_or_404(Cafe, owner=request.user)
+    orders = Order.objects.filter(cafe=cafe).order_by('-ordered_date')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'cafeAdmin_temp/order_list.html', context)
 
 
 @login_required()
-def edit_menu(request):
-    return render(request, 'cafeAdmin_temp/manage_menu.html')
+def order_details(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    context = {
+        'order': order,
+    }
+    return render(request, 'cafeAdmin_temp/order_details.html', context)
 
 
 @login_required()

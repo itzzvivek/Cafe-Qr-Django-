@@ -44,7 +44,10 @@
         .then(data => {
             if (payment_method === 'cash') {
                 alert("Order created successfully. You will be redirected to the thank you page.");
+                //clear the session storage cart data
                 window.location.href = '{% url "core:thank-you" order_id %}';
+                sessionStorage.removeItem('cart')
+
             } else {
                 const options = {
                     "key": data.razorpay_key_id,

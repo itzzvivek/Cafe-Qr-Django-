@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-8">Order Details</h1>
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
+        <p><strong>Phone Number:</strong> {{ order.phone_number }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Table Number:</strong> {{ order.table_number }}</p>
+        <p><strong>Message:</strong> {{ order.message }}</p>
+        <p><strong>Ordered Date:</strong> {{ order.ordered_date }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment }}</p>
+        <p><strong>Total Amount:</strong> ${{ order.get_total }}</p>
+        <h2 class="text-2xl font-bold mt-6">Items</h2>
+        <ul>
+            {% for item in order.items.all %}
+            <li>{{ item.quantity }} x {{ item.item.name }} - ${{ item.item.price }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <a href="{% url 'cafeAdmin:manage_orders' %}" class="bg-blue-500 text-white py-2 px-4 rounded mt-12">Back to Orders</a>
+</div>
+{% endblock %}

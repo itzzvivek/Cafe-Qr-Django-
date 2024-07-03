@@ -300,6 +300,8 @@ class PaymentMethodsView(View):
             request.session['customer_name'] = customer_name
             order.ordered = True
             order.save()
+            if 'cart' in request.session:
+                del request.session['cart']
             return JsonResponse({"redirect_url": '/thank-you'}, {"customer_name": customer_name})
 
         else:
@@ -318,17 +320,15 @@ class PaymentMethodsView(View):
                 "amount": float(total_amount),
                 "name": request.user.username,
                 "email": request.user.email,
-                # "contact": request.user.phone,
-                # "callback_url": 'callback_url',
+                "customer_name": customer_name,
             }
 
             return JsonResponse(context)
 
 
 def thankyou(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id)
+    order = get_object_or_404(Order, pk=order_id)
     context = {
-        'customer_name': order.customer_name,
         'order': order,
     }
     return render(request, 'user_temp/thank_you.html', {'context': context})
