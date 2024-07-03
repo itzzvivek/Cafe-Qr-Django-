@@ -260,6 +260,27 @@ class OrderDetailsView(View):
             return redirect("/")
 
 
+def create_order(request):
+    user = request.user
+    cafe = get_object_or_404(Cafe, id=-request.POST.get('cafe_id'))
+    customer_name = request.POST.get('customer_name')
+    phone_number = request.POST.get('phone_number')
+    table_number = request.POST.get('table_number')
+    message = request.POST.get('message')
+
+    order = Order.objects.create(
+        user=user,
+        cafe=cafe,
+        customer_name=customer_name,
+        phone_number=phone_number,
+        table_number=table_number,
+        message=message,
+        ordered_date=timezone.now(),
+    )
+
+    return redirect("core:thank-you", order_id=order.id)
+
+
 class PaymentMethodsView(View):
     def get(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, pk=order_id, ordered=False)
@@ -304,28 +325,11 @@ class PaymentMethodsView(View):
             return JsonResponse(context)
 
 
-@csrf_exempt
-def update_order_status(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        order_id = data.get('order_id')
-        status = data.get('status')
-        try:
-            order = Order.objects.get(id=order_id)
-            order.status = status
-            order.save()
-            return JsonResponse({'success': True})
-        except Order.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Order not found'})
-    return JsonResponse({'success': True, 'error': 'Invalid request method'})
-
-
 def thankyou(request, order_id):
     order = get_object_or_404(Order, order_id=order_id)
-    cafe = order.cafe
     context = {
         'customer_name': order.customer_name,
-        'cafe': cafe,
+        'order': order,
     }
     return render(request, 'user_temp/thank_you.html', {'context': context})
 

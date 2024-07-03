@@ -4,6 +4,6 @@
 <div class="container mx-auto py-8 text-center">
     <h1 class="text-3xl font-bold mb-8">Thank You for Your Order, {{ customer_name }}!</h1>
     <p>Your order has been successfully created.</p>
-    <a href="{% url 'core:menu' cafe.id %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-12">Back to Home</a>
+    <a href="{% url 'core:menu' order.cafe.id %}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-12">Back to Home</a>
 </div>
 {% endblock %}
