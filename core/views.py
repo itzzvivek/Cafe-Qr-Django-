@@ -280,7 +280,7 @@ def create_order(request):
 
     return redirect("core:thank-you", order_id=order.id)
 
-
+    
 class PaymentMethodsView(View):
     def get(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, pk=order_id, ordered=False)

@@ -74,7 +74,7 @@ def manage_orders(request):
 
 
 @login_required()
-def order_details(request, order_id):
+def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     context = {
         'order': order,
