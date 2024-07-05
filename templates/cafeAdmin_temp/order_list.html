@@ -13,11 +13,10 @@
                 <p><strong>Total Amount:</strong> ${{ order.get_total }}</p>
             </div>
             <div>
-{#                <a href="{% url 'cafeAdmin:order-detail' order.order.id %}" class="bg-blue-500 text-white py-1 px-3 rounded">View Details</a>#}
+                <a href="{% url 'cafeAdmin:order-detail' order.order.id %}" class="bg-blue-500 text-white py-1 px-3 rounded">View Details</a>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 {% endblock %}
-

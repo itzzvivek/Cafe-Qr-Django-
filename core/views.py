@@ -63,9 +63,16 @@ class CartView(View):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         table = request.POST.get('table')
+        cafe_id = request.POST.get('cafe_id')
 
         if not all([name, phone, table]):
             messages.warning(self.request, 'Please fill all the fields')
+            return redirect("core:cart")
+
+        try:
+            cafe = Cafe.objects.get(id=cafe_id)
+        except Cafe.DoesNotExist:
+            messages.warning(self.request, 'Selected cafe does not exist')
             return redirect("core:cart")
 
         order_details = {
@@ -81,6 +88,7 @@ class CartView(View):
                 order.customer_name = name
                 order.customer_phone = phone
                 order.customer_table = table
+                order.cafe = cafe
                 order.save()
                 messages.success(self.request, 'Order has been successfully created')
                 return redirect("core:order-details", pk=order.pk)
@@ -98,7 +106,8 @@ class CartView(View):
                 customer_phone=phone,
                 customer_table=table,
                 ordered=True,
-                ordered_date=timezone.now()
+                ordered_date=timezone.now(),
+                cafe=cafe
             )
 
             for key, item in cart.items():
@@ -261,15 +270,14 @@ class OrderDetailsView(View):
 
 
 def create_order(request):
-    user = request.user
     cafe = get_object_or_404(Cafe, id=-request.POST.get('cafe_id'))
     customer_name = request.POST.get('customer_name')
     phone_number = request.POST.get('phone_number')
     table_number = request.POST.get('table_number')
     message = request.POST.get('message')
+    cafe_id = request.POST.get('cafe_id')
 
     order = Order.objects.create(
-        user=user,
         cafe=cafe,
         customer_name=customer_name,
         phone_number=phone_number,
