@@ -69,12 +69,6 @@ class CartView(View):
             messages.warning(self.request, 'Please fill all the fields')
             return redirect("core:cart")
 
-        try:
-            cafe = Cafe.objects.get(id=cafe_id)
-        except Cafe.DoesNotExist:
-            messages.warning(self.request, 'Selected cafe does not exist')
-            return redirect("core:cart")
-
         order_details = {
             'name': name,
             'phone': phone,
@@ -88,7 +82,7 @@ class CartView(View):
                 order.customer_name = name
                 order.customer_phone = phone
                 order.customer_table = table
-                order.cafe = cafe
+                order.cafe = request.user.cafe_set.first()
                 order.save()
                 messages.success(self.request, 'Order has been successfully created')
                 return redirect("core:order-details", pk=order.pk)
@@ -101,13 +95,15 @@ class CartView(View):
                 messages.warning(request, "Your cart is empty")
                 return redirect("core:cart")
 
+            default_cafe = Cafe.objects.first()
+
             order = Order.objects.create(
                 customer_name=name,
                 customer_phone=phone,
                 customer_table=table,
                 ordered=True,
                 ordered_date=timezone.now(),
-                cafe=cafe
+                cafe=default_cafe
             )
 
             for key, item in cart.items():
