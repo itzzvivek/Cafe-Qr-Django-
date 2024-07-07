@@ -6,7 +6,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
 from django.views.generic import ListView, DetailView, View
 from cafeAdmin.models import Cafe
@@ -32,29 +31,23 @@ def menu_view(request, cafe_id):
 class CartView(View):
     def get(self, request, *args, **kwargs):
         try:
-            if request.user.is_authenticated:
-                order = Order.objects.get(user=self.request.user, ordered=False)
-                context = {
-                    'object': order
-                }
-                return render(self.request, 'user_temp/cart.html', context)
-            else:
-                cart = request.session.get('cart', {})
-                order_items = []
-                total = 0
-                for key, item in cart.items():
-                    total += float(item['price']) * item['quantity']
-                    order_items.append({
-                        'item': item,
-                        'quantity': item['quantity'],
-                        'total_price': float(item['price']) * item['quantity'],
-                        'is_half_portion': item["is_half_portion"]
-                    })
-                context = {
-                    'order_items': order_items,
-                    'total': total
-                }
-                return render(self.request, 'user_temp/cart.html', context)
+            cart = request.session.get('cart', {})
+            order_items = []
+            total = 0
+            for key, item in cart.items():
+                menu_item = MenuItem.objects.filter(slug=key.split('_')[0])
+                total += float(item['price']) * item['quantity']
+                order_items.append({
+                    'item': menu_item,
+                    'quantity': item['quantity'],
+                    'total_price': float(item['price']) * item['quantity'],
+                    'is_half_portion': item["is_half_portion"]
+                })
+            context = {
+                'order_items': order_items,
+                'total': total
+            }
+            return render(self.request, 'user_temp/cart.html', context)
         except ObjectDoesNotExist:
             messages.warning(self.request, 'You do not have an active order')
             return redirect("/")
@@ -63,7 +56,6 @@ class CartView(View):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         table = request.POST.get('table')
-        cafe_id = request.POST.get('cafe_id')
 
         if not all([name, phone, table]):
             messages.warning(self.request, 'Please fill all the fields')
@@ -76,50 +68,37 @@ class CartView(View):
         }
         request.session['order_details'] = order_details
 
-        if request.user.is_authenticated:
-            try:
-                order = Order.objects.get(user=self.request.user, ordered=False)
-                order.customer_name = name
-                order.customer_phone = phone
-                order.customer_table = table
-                order.cafe = request.user.cafe_set.first()
-                order.save()
-                messages.success(self.request, 'Order has been successfully created')
-                return redirect("core:order-details", pk=order.pk)
-            except ObjectDoesNotExist:
-                messages.warning(self.request, 'You do not have an active order')
-                return redirect("core:cart")
-        else:
-            cart = request.session.get('cart', {})
-            if not cart:
-                messages.warning(request, "Your cart is empty")
-                return redirect("core:cart")
+        cart = request.session.get('cart', {})
+        if not cart:
+            messages.warning(request, "Your cart is empty")
+            return redirect("core:cart")
 
-            default_cafe = Cafe.objects.first()
+        default_cafe = Cafe.objects.first()
 
-            order = Order.objects.create(
-                customer_name=name,
-                customer_phone=phone,
-                customer_table=table,
-                ordered=True,
-                ordered_date=timezone.now(),
-                cafe=default_cafe
+        order = Order.objects.create(
+            customer_name=name,
+            phone_number=phone,
+            table_number=table,
+            ordered=True,
+            ordered_date=timezone.now(),
+            cafe=default_cafe,
+             # Assuming a default message field
+        )
+
+        for key, item in cart.items():
+            menu_item = MenuItem.objects.get(slug=key.split("_")[0])
+            is_half_portion = item["is_half_portion"]
+            quantity = item["quantity"]
+            order_item = OrderItem.objects.create(
+                item=menu_item,
+                quantity=quantity,
+                is_half_portion=is_half_portion
             )
+            order.items.add(order_item)
 
-            for key, item in cart.items():
-                menu_item = MenuItem.objects.get(slug=key.split("_")[0])
-                is_half_portion = item["is_half_portion"]
-                quantity = item["quantity"]
-                OrderItem.objects.create(
-                    item=menu_item,
-                    order=order,
-                    quantity=quantity,
-                    is_half_portion=is_half_portion
-                )
-
-            request.session['cart'] = {}
-            messages.success(self.request, 'Order has been successfully created (guest user)')
-            return redirect("core:order-details", pk=order.pk)
+        request.session['cart'] = {}
+        messages.success(self.request, 'Order has been successfully created')
+        return redirect("core:order-details", pk=order.pk)
 
 
 def add_to_cart(request, slug):
@@ -263,26 +242,6 @@ class OrderDetailsView(View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
-
-
-def create_order(request):
-    cafe = get_object_or_404(Cafe, id=-request.POST.get('cafe_id'))
-    customer_name = request.POST.get('customer_name')
-    phone_number = request.POST.get('phone_number')
-    table_number = request.POST.get('table_number')
-    message = request.POST.get('message')
-    cafe_id = request.POST.get('cafe_id')
-
-    order = Order.objects.create(
-        cafe=cafe,
-        customer_name=customer_name,
-        phone_number=phone_number,
-        table_number=table_number,
-        message=message,
-        ordered_date=timezone.now(),
-    )
-
-    return redirect("core:thank-you", order_id=order.id)
 
     
 class PaymentMethodsView(View):
