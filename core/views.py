@@ -30,12 +30,12 @@ def menu_view(request, cafe_id):
 
 class CartView(View):
     def get(self, request, *args, **kwargs):
-        try:
-            cart = request.session.get('cart', {})
-            order_items = []
-            total = 0
-            for key, item in cart.items():
-                menu_item = MenuItem.objects.filter(slug=key.split('_')[0])
+        cart = request.session.get('cart', {})
+        order_items = []
+        total = 0
+        for key, item in cart.items():
+            try:
+                menu_item = MenuItem.objects.get(slug=key.split("_")[0])
                 total += float(item['price']) * item['quantity']
                 order_items.append({
                     'item': menu_item,
@@ -43,14 +43,13 @@ class CartView(View):
                     'total_price': float(item['price']) * item['quantity'],
                     'is_half_portion': item["is_half_portion"]
                 })
-            context = {
-                'order_items': order_items,
-                'total': total
-            }
-            return render(self.request, 'user_temp/cart.html', context)
-        except ObjectDoesNotExist:
-            messages.warning(self.request, 'You do not have an active order')
-            return redirect("/")
+            except MenuItem.DoesNotExist:
+                continue
+        context = {
+            'order_items': order_items,
+            'total': total
+        }
+        return render(request, 'user_temp/cart.html', context)
 
     def post(self, request, *args, **kwargs):
         name = request.POST.get('name')
@@ -58,15 +57,8 @@ class CartView(View):
         table = request.POST.get('table')
 
         if not all([name, phone, table]):
-            messages.warning(self.request, 'Please fill all the fields')
+            messages.warning(request, 'Please fill all the fields')
             return redirect("core:cart")
-
-        order_details = {
-            'name': name,
-            'phone': phone,
-            'table': table
-        }
-        request.session['order_details'] = order_details
 
         cart = request.session.get('cart', {})
         if not cart:
@@ -81,23 +73,27 @@ class CartView(View):
             table_number=table,
             ordered=True,
             ordered_date=timezone.now(),
-            cafe=default_cafe,
-             # Assuming a default message field
+            cafe=default_cafe
         )
 
         for key, item in cart.items():
-            menu_item = MenuItem.objects.get(slug=key.split("_")[0])
-            is_half_portion = item["is_half_portion"]
-            quantity = item["quantity"]
-            order_item = OrderItem.objects.create(
-                item=menu_item,
-                quantity=quantity,
-                is_half_portion=is_half_portion
-            )
-            order.items.add(order_item)
+            try:
+                menu_item = MenuItem.objects.get(slug=key.split("_")[0])
+                is_half_portion = item["is_half_portion"]
+                quantity = item["quantity"]
+                order_item = OrderItem.objects.create(
+                    item=menu_item,
+                    quantity=quantity,
+                    is_half_portion=is_half_portion,
+                    ordered=True
+                )
+                order.items.add(order_item)
+            except MenuItem.DoesNotExist:
+                continue
 
+        order.save()
         request.session['cart'] = {}
-        messages.success(self.request, 'Order has been successfully created')
+        messages.success(request, 'Order has been successfully created')
         return redirect("core:order-details", pk=order.pk)
 
 
@@ -108,47 +104,20 @@ def add_to_cart(request, slug):
 
     if quantity <= 0:
         messages.warning(request, 'Quantity must be greater than zero')
+        return redirect("core:menu")
 
-    if request.user.is_authenticated:
-        order_item, created = OrderItem.objects.get_or_create(
-            item=item,
-            user=request.user,
-            ordered=False,
-            is_half_portion=is_half_portion
-        )
-        order_qs = Order.objects.filter(user=request.user, ordered=False)
-        if order_qs.exists():
-            order = order_qs[0]
-            # check if the order item is in the order
-            if order.items.filter(item__slug=item.slug, is_half_portion=is_half_portion).exists():
-                order_item.quantity += 1
-                order_item.save()
-                messages.info(request, "This item quantity was updated.")
-                return redirect("core:cart")
-            else:
-                order.items.add(order_item)
-                messages.info(request, "This item was added to your cart.")
-                return redirect("core:cart")
-        else:
-            ordered_date = timezone.now()
-            order = Order.objects.create(
-                user=request.user, ordered_date=ordered_date)
-            order.items.add(order_item)
-            messages.info(request, "This item was added to your cart. ")
-            return redirect("core:cart")
-    else:
-        cart = request.session.get('cart', {})
-        portion_key = 'half' if is_half_portion else 'full'
-        cart_key = f"{slug}_{portion_key}"
-        cart_item = cart.get(cart_key, {
-            'name': item.name,
-            'quantity': 0,
-            'price': str(item.min_price if is_half_portion else item.max_price),
-            'is_half_portion': is_half_portion
-        })
-        cart_item['quantity'] += 1
-        cart[slug] = cart_item
-        request.session['cart'] = cart
+    cart = request.session.get('cart', {})
+    portion_key = 'half' if is_half_portion else 'full'
+    cart_key = f"{slug}_{portion_key}"
+    cart_item = cart.get(cart_key, {
+        'name': item.name,
+        'quantity': 0,
+        'price': str(item.min_price if is_half_portion else item.max_price),
+        'is_half_portion': is_half_portion
+    })
+    cart_item['quantity'] += quantity
+    cart[cart_key] = cart_item
+    request.session['cart'] = cart
     messages.info(request, "This item was added to your cart.")
     return redirect("core:cart")
 
