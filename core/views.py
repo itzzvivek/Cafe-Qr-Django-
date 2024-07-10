@@ -71,7 +71,7 @@ class CartView(View):
             customer_name=name,
             phone_number=phone,
             table_number=table,
-            ordered=True,
+            ordered=False,
             ordered_date=timezone.now(),
             cafe=default_cafe
         )
@@ -85,16 +85,16 @@ class CartView(View):
                     item=menu_item,
                     quantity=quantity,
                     is_half_portion=is_half_portion,
-                    ordered=True
+                    ordered=False
                 )
                 order.items.add(order_item)
             except MenuItem.DoesNotExist:
                 continue
 
         order.save()
-        request.session['cart'] = {}
+        # request.session['cart'] = {}
         messages.success(request, 'Order has been successfully created')
-        return redirect("core:order-details", pk=order.pk)
+        return redirect("core:order-details", order_id=order.pk)
 
 
 def add_to_cart(request, slug):
@@ -180,39 +180,48 @@ def remove_single_item_from_cart(request, slug):
 
 
 class OrderDetailsView(View):
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, order_id, *args, **kwargs):
         order_details = request.session.get('order_details', {})
-        try:
-            if request.user.is_authenticated:
-                order = Order.objects.get(pk=pk, user=self.request.user, ordered=False)
-                context = {
-                    'order': order,
-                    'order_details': order_details
-                }
-            else:
-                cart = request.session.get('cart', {})
-                order_items = []
-                total = 0
-                for key, item in cart.items():
-                    total += float(item['price']) * item['quantity']
-                    order_items.append({
-                        'item': item['name'],
-                        'quantity': item['quantity'],
-                        'price': item['price'],
-                        'total_price': float(item['price']) * float(item['quantity']),
-                        'is_half_portion': item['is_half_portion']
-                    })
-                context = {
-                    'order_items': order_items,
-                    'total': total,
-                    'order_details': order_details
-                }
-            return render(request, 'user_temp/order_details.html', context)
-        except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+        order_items = []
+        total = 0
 
-    
+        try:
+            order = Order.objects.get(pk=order_id, ordered=False)
+
+            for order_item in order.items.all():
+                total += order_item.get_final_price()
+                order_items.append({
+                    'item': order_item.item,
+                    'quantity': order_item.quantity,
+                    'price': order_item.get_item_price(),
+                    'total_price': order_item.get_final_price(),
+                    'is_half_portion': order_item.is_half_portion
+                })
+                print()
+        except ObjectDoesNotExist:
+            order = None
+            cart = request.session.get('cart', {})
+            for key, item in cart.items():
+                menu_item = get_object_or_404(MenuItem, slug=key.split('_')[0])
+                total += float(item['price']) * item['quantity']
+                order_items.append({
+                    'item': menu_item,
+                    'quantity': item['quantity'],
+                    'price': item['price'],
+                    'total_price': float(item['price']) * item['quantity'],
+                    'is_half_portion': item['is_half_portion']
+                })
+
+        context = {
+            'order': order,
+            'order_items': order_items,
+            'total': total,
+            'order_details': order_details,
+            'order_id': order_id
+        }
+        return render(request, 'user_temp/order_details.html', context)
+
+
 class PaymentMethodsView(View):
     def get(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, pk=order_id, ordered=False)

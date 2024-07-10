@@ -1,41 +1,36 @@
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load custom_filters %}
 
 {% block content %}
 <div class="container mx-auto py-8">
     <h1 class="text-3xl font-bold text-center mb-8">Order Details</h1>
-    <h2 class="order_id ">#{{ order.order_id }}</h2>
+    <h2 class="order_id ">#{{ order_id }}</h2>
     <div class="w-full mb-8">
         <div class="w-full">
             <h2 class="text-2xl font-bold mb-4">Items in Your Order:</h2>
-            {% if order.items.exists %}
+            {% if order_items %}
                 <ul>
-                    {% for order_item in order.items.all %}
+                    {% for order_item in order_items %}
                         <li class="flex items-center justify-between mb-4">
                             <div>
                                 {{ order_item.item.name }} -
                                 {% if order_item.is_half_portion %}
-                                    Half Portion - Price: ${{ order_item.item.min_price }}
+                                    Half Portion - Price: ${{ order_item.price }}
                                 {% else %}
-                                    Full Portion - Price: ${{ order_item.item.max_price }}
+                                    Full Portion - Price: ${{ order_item.price }}
                                 {% endif %}
                             </div>
                             <div>
                                 Quantity: {{ order_item.quantity }}
                             </div>
                             <div class="ml-4">
-                                Total: $
-                                {% if order_item.is_half_portion %}
-                                    {{ order_item.quantity|multiply:order_item.item.min_price }}
-                                {% else %}
-                                    {{ order_item.quantity|multiply:order_item.item.max_price }}
-                                {% endif %}
+                                Total: ${{ order_item.total_price }}
                             </div>
                         </li>
                     {% endfor %}
                 </ul>
                 <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ order.get_total }}</p>
+                <p class="text-lg font-bold">Total: ${{ total }}</p>
             {% else %}
                 <p>You do not have any items in your order.</p>
             {% endif %}
@@ -52,7 +47,7 @@
         {% endif %}
     </div>
     <div class="flex justify-center mt-8">
-        <a href="{% url 'core:payment-method' order.order_id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</a>
+        <a href="{% url 'core:payment-method' order_id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed to Payment</a>
     </div>
 </div>
 {% endblock %}

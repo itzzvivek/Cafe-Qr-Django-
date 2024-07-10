@@ -41,7 +41,6 @@ class MenuItem(models.Model):
 
 
 class OrderItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=False)
     ordered = models.BooleanField(default=False)
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -71,11 +70,9 @@ class OrderItem(models.Model):
 class Order(models.Model):
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE, null=True, blank=True)
     order_id = models.AutoField(primary_key=True, unique=True, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     customer_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(max_length=245)
-    table_number = models.IntegerField(default=False)
+    table_number = models.IntegerField()
     message = models.TextField()
     items = models.ManyToManyField(OrderItem, related_name='orders')
     ordered_date = models.DateTimeField()
