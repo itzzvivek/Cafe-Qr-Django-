@@ -92,7 +92,14 @@ class CartView(View):
                 continue
 
         order.save()
-        # request.session['cart'] = {}
+
+        request.session['order_details'] = {
+            'name': name,
+            'phone': phone,
+            'table': table,
+        }
+
+        request.session['cart'] = {}
         messages.success(request, 'Order has been successfully created')
         return redirect("core:order-details", order_id=order.pk)
 
@@ -124,51 +131,39 @@ def add_to_cart(request, slug):
 
 def remove_from_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
-    order_qs = Order.objects.filter(
-        user=request.user,
-        ordered=False
-    )
+    order_qs = Order.objects.filter(ordered=False)
     if order_qs.exists():
         order = order_qs[0]
         # check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(
-                item=item,
-                user=request.user,
-                ordered=False
-            )[0]
+            order_item = OrderItem.objects.filter(item=item, ordered=False)[0]
             order.items.remove(order_item)
             order_item.delete()
             messages.info(request, "This item was removed from your cart.")
             return redirect("core:cart")
         else:
             messages.info(request, "This item was not in your cart")
-            return redirect("core:menu", slug=slug)
+            return redirect("core:menu", slug=item.slug)
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("core:menu", slug=slug)
+        return redirect("core:menu", slug=item.slug)
 
 
 def remove_single_item_from_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
-    order_qs = Order.objects.filter(
-        user=request.user,
-        ordered=False
-    )
+    order_qs = Order.objects.filter(ordered=False)
+
     if order_qs.exists():
         order = order_qs[0]
         # Check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(
-                item=item,
-                user=request.user,
-                ordered=False
-            )[0]
+            order_item = OrderItem.objects.filter(item=item, ordered=False)[0]
             if order_item.quantity > 1:
                 order_item.quantity -= 1
                 order_item.save()
             else:
                 order.items.remove(order_item)
+                order_item.delete()
             messages.info(request, "This item was removed from your cart.")
             return redirect("core:cart")
         else:
@@ -176,7 +171,7 @@ def remove_single_item_from_cart(request, slug):
             return redirect("core:cart")
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("core:menu", slug=slug)
+        return redirect("core:menu", slug=item.slug)
 
 
 class OrderDetailsView(View):
@@ -187,9 +182,7 @@ class OrderDetailsView(View):
 
         try:
             order = Order.objects.get(pk=order_id, ordered=False)
-
             for order_item in order.items.all():
-                total += order_item.get_final_price()
                 order_items.append({
                     'item': order_item.item,
                     'quantity': order_item.quantity,
@@ -197,20 +190,9 @@ class OrderDetailsView(View):
                     'total_price': order_item.get_final_price(),
                     'is_half_portion': order_item.is_half_portion
                 })
-                print()
+                total += order_item.get_final_price()
         except ObjectDoesNotExist:
             order = None
-            cart = request.session.get('cart', {})
-            for key, item in cart.items():
-                menu_item = get_object_or_404(MenuItem, slug=key.split('_')[0])
-                total += float(item['price']) * item['quantity']
-                order_items.append({
-                    'item': menu_item,
-                    'quantity': item['quantity'],
-                    'price': item['price'],
-                    'total_price': float(item['price']) * item['quantity'],
-                    'is_half_portion': item['is_half_portion']
-                })
 
         context = {
             'order': order,
@@ -242,7 +224,7 @@ class PaymentMethodsView(View):
             order.ordered = True
             order.save()
             if 'cart' in request.session:
-                del request.session['cart']
+                request.session['cart'] = {}
             return JsonResponse({"redirect_url": '/thank-you'}, {"customer_name": customer_name})
 
         else:
