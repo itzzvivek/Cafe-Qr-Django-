@@ -22,7 +22,7 @@
                                 {% endif %}
                             </div>
                             <div class="flex items-center">
-                                <a href="{% url 'core:remove-single-item-from-cart' slug=order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
+                                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
                                 <span class="px-4">{{ order_item.quantity }}</span>
                                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
                             </div>
@@ -35,7 +35,7 @@
                                 {% endif %}
                             </div>
                             <div class="ml-4">
-                                <a href="{% url 'core:remove-from-cart' slug=order_item.item.slug %}" class="btn btn-danger">Remove</a>
+                                <a href="{% url 'core:remove-from-cart' order_item.item.slug %}" class="btn btn-danger">Remove</a>
                            </div>
                         </li>
                     {% endfor %}
@@ -55,7 +55,7 @@
                                 {% endif %}
                             </div>
                             <div class="flex items-center">
-                                <a href="{% url 'core:remove-single-item-from-cart' slug=order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
+                                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
                                 <span class="px-4">{{ order_item.quantity }}</span>
                                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
                             </div>
@@ -68,7 +68,7 @@
                                 {% endif %}
                             </div>
                             <div class="ml-4">
-                                <a href="{% url 'core:remove-from-cart' slug=order_item.item.slug %}" class="btn btn-danger">Remove</a>
+                                <a href="{% url 'core:remove-from-cart' order_item.item.slug %}" class="btn btn-danger">Remove</a>
                             </div>
                         </li>
                     {% endfor %}

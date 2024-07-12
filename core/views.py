@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from .models import Category, MenuItem, Order, OrderItem, Payment, Refund, Coupon
+from .models import Category, MenuItem, Order, OrderItem
 from django.views.generic import ListView, DetailView, View
 from cafeAdmin.models import Cafe
 
@@ -136,17 +136,17 @@ def remove_from_cart(request, slug):
         order = order_qs[0]
         # check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(item=item, ordered=False)[0]
+            order_item = OrderItem.objects.filter(item=item, ordered=False).first()
             order.items.remove(order_item)
             order_item.delete()
             messages.info(request, "This item was removed from your cart.")
             return redirect("core:cart")
         else:
             messages.info(request, "This item was not in your cart")
-            return redirect("core:menu", slug=item.slug)
+            return redirect("core:menu", cafe_id=item.cafe.id)
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("core:menu", slug=item.slug)
+        return redirect("core:menu", cafe_id=item.cafe.id)
 
 
 def remove_single_item_from_cart(request, slug):
@@ -171,7 +171,7 @@ def remove_single_item_from_cart(request, slug):
             return redirect("core:cart")
     else:
         messages.info(request, "You do not have an active order")
-        return redirect("core:menu", slug=item.slug)
+        return redirect("core:menu",  cafe_id=item.cafe.id)
 
 
 class OrderDetailsView(View):
