@@ -134,25 +134,22 @@ def remove_from_cart(request, slug):
     order_qs = Order.objects.filter(ordered=False)
     if order_qs.exists():
         order = order_qs[0]
-        # check if the order item is in the order
+        # Check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(item=item, ordered=False).first()
+            order_item = OrderItem.objects.filter(item=item, ordered=False)[0]
             order.items.remove(order_item)
             order_item.delete()
             messages.info(request, "This item was removed from your cart.")
-            return redirect("core:cart")
         else:
-            messages.info(request, "This item was not in your cart")
-            return redirect("core:menu", cafe_id=item.cafe.id)
+            messages.info(request, "This item was not in your cart.")
     else:
-        messages.info(request, "You do not have an active order")
-        return redirect("core:menu", cafe_id=item.cafe.id)
+        messages.info(request, "You do not have an active order.")
+    return redirect("core:cart")
 
 
 def remove_single_item_from_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
     order_qs = Order.objects.filter(ordered=False)
-
     if order_qs.exists():
         order = order_qs[0]
         # Check if the order item is in the order
@@ -164,14 +161,12 @@ def remove_single_item_from_cart(request, slug):
             else:
                 order.items.remove(order_item)
                 order_item.delete()
-            messages.info(request, "This item was removed from your cart.")
-            return redirect("core:cart")
+            messages.info(request, "This item quantity was updated.")
         else:
-            messages.info(request, "This item was not in your cart")
-            return redirect("core:cart")
+            messages.info(request, "This item was not in your cart.")
     else:
-        messages.info(request, "You do not have an active order")
-        return redirect("core:menu",  cafe_id=item.cafe.id)
+        messages.info(request, "You do not have an active order.")
+    return redirect("core:cart")
 
 
 class OrderDetailsView(View):

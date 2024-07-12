@@ -15,7 +15,8 @@ class MenuItemAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
-                    'ordered',
+                    'customer_name',
+                    'ordered_date',
                     'refund_requested',
                     'refund_granted',
                     'payment',
@@ -25,9 +26,11 @@ class OrderAdmin(admin.ModelAdmin):
                           'payment',
                           'coupon',
                           ]
-    list_filter = ['ordered',
-                   'refund_requested',
-                   'refund_granted',
+    list_filter = [
+                    'cafe',
+                    'ordered_date',
+                    'refund_requested',
+                    'refund_granted',
                    ]
     search_fields = [
                      'ref_code',
@@ -43,7 +46,7 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(MenuItem, MenuItemAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(OrderItem)
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Payment)
 admin.site.register(Refund)
 admin.site.register(Coupon)
