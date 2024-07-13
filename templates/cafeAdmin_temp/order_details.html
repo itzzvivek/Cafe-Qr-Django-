@@ -7,7 +7,6 @@
         <p><strong>Order ID:</strong> {{ order.order_id }}</p>
         <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
         <p><strong>Phone Number:</strong> {{ order.phone_number }}</p>
-        <p><strong>Email:</strong> {{ order.email }}</p>
         <p><strong>Table Number:</strong> {{ order.table_number }}</p>
         <p><strong>Message:</strong> {{ order.message }}</p>
         <p><strong>Ordered Date:</strong> {{ order.ordered_date }}</p>
@@ -20,6 +19,6 @@
             {% endfor %}
         </ul>
     </div>
-    <a href="{% url 'cafeAdmin:manage_orders' %}" class="bg-blue-500 text-white py-2 px-4 rounded mt-12">Back to Orders</a>
+    <a href="{% url 'cafeAdmin:manage-orders' %}" class="bg-blue-500 text-white py-2 px-4 rounded mt-12">Back to Orders</a>
 </div>
 {% endblock %}
