@@ -130,43 +130,38 @@ def add_to_cart(request, slug):
 
 
 def remove_from_cart(request, slug):
-    item = get_object_or_404(MenuItem, slug=slug)
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    cart = request.session.get('cart', {})
+    portion_key = 'half' if request.GET.get('portion') == 'half' else 'full'
+    cart_key = f"{slug}_{portion_key}"
 
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(item=item, user=request.user, ordered=False)[0]
-            order.items.remove(order_item)
-            order_item.delete()
-            messages.info(request, "This item was removed from your cart.")
-        else:
-            messages.info(request, "This item was not in your cart.")
+    if cart_key in cart:
+        del cart[cart_key]
+        request.session['cart'] = cart
+        messages.info(request, "This item was removed from your cart.")
     else:
-        messages.info(request, "You do not have an active order.")
+        messages.info(request, "This item was not in your cart.")
 
     return redirect("core:cart")
 
 
 def remove_single_item_from_cart(request, slug):
-    item = get_object_or_404(MenuItem, slug=slug)
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    cart = request.session.get('cart', {})
+    portion_key = 'half' if request.GET.get('portion') == 'half' else 'full'
+    cart_key = f"{slug}_{portion_key}"
 
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(item=item, user=request.user, ordered=False)[0]
-            if order_item.quantity > 1:
-                order_item.quantity -= 1
-                order_item.save()
-            else:
-                order.items.remove(order_item)
-                order_item.delete()
+    if cart_key in cart:
+        cart_item = cart[cart_key]
+        if cart_item['quantity'] > 1:
+            cart_item['quantity'] -= 1
+            cart[cart_key] = cart_item
+            request.session['cart'] = cart
             messages.info(request, "This item quantity was updated.")
         else:
-            messages.info(request, "This item was not in your cart.")
+            del cart[cart_key]
+            request.session['cart'] = cart
+            messages.info(request, "This item was removed from your cart.")
     else:
-        messages.info(request, "You do not have an active order.")
+        messages.info(request, "This item was not in your cart.")
 
     return redirect("core:cart")
 
