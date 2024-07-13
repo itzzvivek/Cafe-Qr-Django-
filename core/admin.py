@@ -15,6 +15,7 @@ class MenuItemAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
+                    'user',
                     'customer_name',
                     'ordered_date',
                     'refund_requested',
@@ -36,6 +37,12 @@ class OrderAdmin(admin.ModelAdmin):
                      'ref_code',
                      ]
     actions = [make_refund_accepted]
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        if request.user.is_superuser:
+            return queryset
+        return queryset.filtet(user=request.user)
 
 
 class CategoryAdmin(admin.ModelAdmin):

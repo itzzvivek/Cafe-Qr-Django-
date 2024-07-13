@@ -71,6 +71,7 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE, null=True, blank=True)
     order_id = models.AutoField(primary_key=True, unique=True, editable=False)
     customer_name = models.CharField(max_length=50)
