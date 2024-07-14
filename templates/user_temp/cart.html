@@ -9,9 +9,9 @@
         <!-- Order List -->
         <div class="w-full">
             <h2 class="text-2xl font-bold mb-4">Your Orders:</h2>
-            {% if object %}
+            {% if order_items %}
                 <ul>
-                    {% for order_item in object.items.all %}
+                    {% for order_item in order_items %}
                         <li class="flex items-center justify-between mb-4">
                             <div>
                                 {{ order_item.item.name }} -
@@ -41,39 +41,6 @@
                     {% endfor %}
                 </ul>
                 <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ object.get_total }}</p>
-            {% elif order_items %}
-                <ul>
-                    {% for order_item in order_items %}
-                        <li class="flex items-center justify-between mb-4">
-                            <div>
-                                {{ order_item.item.name }} -
-                                {% if order_item.is_half_portion %}
-                                    Half Portion - Price: ${{ order_item.price }}
-                                {% else %}
-                                    Full Portion - Price: ${{ order_item.price }}
-                                {% endif %}
-                            </div>
-                            <div class="flex items-center">
-                                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">-</a>
-                                <span class="px-4">{{ order_item.quantity }}</span>
-                                <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
-                            </div>
-                            <div class="ml-4">
-                                Total: $
-                                {% if order_item.is_half_portion %}
-                                    {{ order_item.quantity|multiply:order_item.item.min_price }}
-                                {% else %}
-                                    {{ order_item.quantity|multiply:order_item.item.max_price }}
-                                {% endif %}
-                            </div>
-                            <div class="ml-4">
-                                <a href="{% url 'core:remove-from-cart' order_item.item.slug %}" class="btn btn-danger">Remove</a>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <hr class="my-4">
                 <p class="text-lg font-bold">Total: ${{ total }}</p>
             {% else %}
                 <p>You do not have any items in your cart.</p>
@@ -85,13 +52,15 @@
         <h2 class="text-2xl font-bold mb-4">Place Your Order:</h2>
         <form method="POST" action="{% url 'core:cart' %}">
             {% csrf_token %}
-            <input type="hidden" name="cafe_id" value="{{cafe.id}}">
+            <input type="hidden" name="cafe_id" value="{{ cafe.id }}">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" ><br><br>
+            <input type="text" id="name" name="name" required><br><br>
             <label for="phone">Phone Number:</label>
-            <input type="text" id="phone" name="phone" ><br><br>
+            <input type="text" id="phone" name="phone" required><br><br>
             <label for="table">Table Number:</label>
-            <input type="text" id="table" name="table" ><br><br>
+            <input type="text" id="table" name="table" required><br><br>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
             <button type="submit" class="btn bg-green-500 text-white p-2 rounded-lg">Place Order</button>
         </form>
     </div>

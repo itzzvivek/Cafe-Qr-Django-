@@ -8,4 +8,4 @@ def multiply(value, arg):
     try:
         return value * arg
     except (ValueError, TypeError):
-        return ''
+        return None

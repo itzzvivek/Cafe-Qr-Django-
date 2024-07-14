@@ -55,6 +55,7 @@ class CartView(View):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         table = request.POST.get('table')
+        message = request.POST.get('message')
 
         if not all([name, phone, table]):
             messages.warning(request, 'Please fill all the fields')
@@ -71,6 +72,7 @@ class CartView(View):
             customer_name=name,
             phone_number=phone,
             table_number=table,
+            message=message,
             ordered=False,
             ordered_date=timezone.now(),
             cafe=default_cafe
@@ -97,6 +99,7 @@ class CartView(View):
             'name': name,
             'phone': phone,
             'table': table,
+            'message': message,
         }
 
         request.session['cart'] = {}
