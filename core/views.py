@@ -6,8 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from .models import Category, MenuItem, Order, OrderItem
-from django.views.generic import ListView, DetailView, View
+from .models import Category, MenuItem, Order, OrderItem, Payment
+from django.views.generic import View
 from cafeAdmin.models import Cafe
 
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
@@ -215,7 +215,13 @@ class PaymentMethodsView(View):
         customer_name = order.customer_name
 
         if payment_method == "cash":
-            request.session['customer_name'] = customer_name
+            payment = Payment.objects.create(
+                razorpay_charge_id = "N/A",
+                customer_name=customer_name,
+                amount= order.get_total()
+            )
+            order.payment = payment
+            order.payment_method = 'cash '
             order.ordered = True
             order.save()
             if 'cart' in request.session:
@@ -231,6 +237,10 @@ class PaymentMethodsView(View):
                 "currency": currency,
                 "payment_capture": "1"
             })
+
+            order.payment = payment_method
+            order.payment_method = 'razorpay'
+            order.save()
 
             context = {
                 "razorpay_order_id": razorpay_order['id'],

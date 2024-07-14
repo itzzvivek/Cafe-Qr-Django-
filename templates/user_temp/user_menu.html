@@ -14,7 +14,7 @@
                         {% if cat == category %}
                             {% for item in items %}
                                 <li>{{ item.name }}
-                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">${{ item.max_price }}</button>
+                                    <button data-item="{{ item.name }}" data-slug="{{ item.slug }}" data-max-price="{{ item.max_price }}" data-min-price="{{ item.min_price }}" class="max-price-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 ml-4 rounded-lg mb-2">₹{{ item.max_price }}</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
@@ -42,7 +42,7 @@
                 <input type="number" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="halfQuantity" value="0">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseHalfQty">+</button>
             </div>
-            <p>Price: $<span id="halfPrice"></span></p>
+            <p>Price: ₹<span id="halfPrice"></span></p>
         </div>
         <div class="my-4">
             <label class="block mb-2">Full Portion:</label>
@@ -51,7 +51,7 @@
                 <input type="number" class="border border-gray-300 rounded-none py-2 px-4 w-16 text-center" id="fullQuantity" value="0">
                 <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-r-lg" id="increaseFullQty">+</button>
             </div>
-            <p>Price: $<span id="fullPrice"></span></p>
+            <p>Price: ₹<span id="fullPrice"></span></p>
         </div>
         <div class="flex justify-end">
             <button id="addToCartButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add to Cart</button>

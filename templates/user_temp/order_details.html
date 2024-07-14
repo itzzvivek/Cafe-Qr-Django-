@@ -15,22 +15,22 @@
                             <div>
                                 {{ order_item.item.name }} -
                                 {% if order_item.is_half_portion %}
-                                    Half Portion - Price: ${{ order_item.price }}
+                                    Half Portion - Price: ₹{{ order_item.price }}
                                 {% else %}
-                                    Full Portion - Price: ${{ order_item.price }}
+                                    Full Portion - Price: ₹{{ order_item.price }}
                                 {% endif %}
                             </div>
                             <div>
                                 Quantity: {{ order_item.quantity }}
                             </div>
                             <div class="ml-4">
-                                Total: ${{ order_item.total_price }}
+                                Total: ₹{{ order_item.total_price }}
                             </div>
                         </li>
                     {% endfor %}
                 </ul>
                 <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ total }}</p>
+                <p class="text-lg font-bold">Total: ₹{{ total }}</p>
             {% else %}
                 <p>You do not have any items in your order.</p>
             {% endif %}

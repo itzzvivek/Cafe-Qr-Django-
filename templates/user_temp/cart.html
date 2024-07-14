@@ -16,9 +16,9 @@
                             <div>
                                 {{ order_item.item.name }} -
                                 {% if order_item.is_half_portion %}
-                                    Half Portion - Price: ${{ order_item.item.min_price }}
+                                    Half Portion - Price: ₹{{ order_item.item.min_price }}
                                 {% else %}
-                                    Full Portion - Price: ${{ order_item.item.max_price }}
+                                    Full Portion - Price: ₹{{ order_item.item.max_price }}
                                 {% endif %}
                             </div>
                             <div class="flex items-center">
@@ -27,7 +27,7 @@
                                 <a href="{% url 'core:add-to-cart' order_item.item.slug %}" class="btn bg-gray-500 text-white p-2">+</a>
                             </div>
                             <div class="ml-4">
-                                Total: $
+                                Total: ₹
                                 {% if order_item.is_half_portion %}
                                     {{ order_item.quantity|multiply:order_item.item.min_price }}
                                 {% else %}
@@ -41,7 +41,7 @@
                     {% endfor %}
                 </ul>
                 <hr class="my-4">
-                <p class="text-lg font-bold">Total: ${{ total }}</p>
+                <p class="text-lg font-bold">Total: ₹{{ total }}</p>
             {% else %}
                 <p>You do not have any items in your cart.</p>
             {% endif %}

@@ -11,11 +11,11 @@
         <p><strong>Message:</strong> {{ order.message }}</p>
         <p><strong>Ordered Date:</strong> {{ order.ordered_date }}</p>
         <p><strong>Payment Method:</strong> {{ order.payment }}</p>
-        <p><strong>Total Amount:</strong> ${{ order.get_total }}</p>
+        <p><strong>Total Amount:</strong> ₹{{ order.get_total }}</p>
         <h2 class="text-2xl font-bold mt-6">Items</h2>
         <ul>
             {% for item in order.items.all %}
-            <li>{{ item.quantity }} x {{ item.item.name }} - ${{ item.item.price }}</li>
+            <li>{{ item.quantity }} x {{ item.item.name }} - ₹{{ item.item.price }}</li>
             {% endfor %}
         </ul>
     </div>

@@ -5,7 +5,8 @@ from .models import Category, MenuItem, OrderItem, Order, Coupon, Payment, Refun
 def make_refund_accepted(modeladmin, request, queryset):
     queryset.update(refund_requested=False, refund_granted=True)
 
-    make_refund_accepted.short_description = 'Update orders to refund granted'
+
+make_refund_accepted.short_description = 'Update orders to refund granted'
 
 
 class MenuItemAdmin(admin.ModelAdmin):
@@ -42,7 +43,7 @@ class OrderAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         if request.user.is_superuser:
             return queryset
-        return queryset.filtet(user=request.user)
+        return queryset.filter(user=request.user)
 
 
 class CategoryAdmin(admin.ModelAdmin):

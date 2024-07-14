@@ -1,8 +1,12 @@
 from django.db import models
-from django.conf import settings
 from django.shortcuts import reverse
 from cafeAdmin.models import Cafe
 from django.contrib.auth.models import User
+
+PAYMENT_CHOICES = [
+    ('cash', 'Cash'),
+    ('razorpay', 'Razorpay')
+]
 
 
 class Category(models.Model):
@@ -103,12 +107,13 @@ class Order(models.Model):
 
 class Payment(models.Model):
     payment_charge_id = models.CharField(max_length=50)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=False, null=True)
+    customer_name = models.CharField(max_length=50)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES)
 
     def __str__(self):
-        return self.user
+        return f"{self.customer_name} - {self.amount}"
 
 
 class Coupon(models.Model):

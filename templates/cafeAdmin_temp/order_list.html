@@ -10,7 +10,7 @@
                 <p><strong>Order ID:</strong> {{ order.order_id }}</p>
                 <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
                 <p><strong>Table Number:</strong> {{ order.table_number }}</p>
-                <p><strong>Total Amount:</strong> ${{ order.get_total }}</p>
+                <p><strong>Total Amount:</strong> ₹{{ order.get_total }}</p>
             </div>
             <div>
                 <a href="{% url 'cafeAdmin:order-detail' order.pk %}" class="bg-blue-500 text-white py-1 px-3 rounded">View Details</a>
