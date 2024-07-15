@@ -45,7 +45,6 @@
             if (payment_method === 'cash') {
                 alert("Order created successfully. You will be redirected to the thank you page.");
                 window.location.href = '{% url "core:thank-you" order_id %}';
-                sessionStorage.removeItem('cart');
             } else {
                 const options = {
                     "key": data.razorpay_key_id,
@@ -71,7 +70,6 @@
                         .then(data => {
                             alert("Payment Successful");
                             window.location.href = '{% url "core:thank-you" order_id %}';
-                            sessionStorage.setItem('customer_name', data.customer_name);
                         })
                         .catch(error => console.error("Error:", error));
                     },

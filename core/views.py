@@ -211,22 +211,25 @@ class PaymentMethodsView(View):
 
     def post(self, request, order_id, *args, **kwargs):
         order = get_object_or_404(Order, pk=order_id, ordered=False)
-        payment_method = request.POST.get("payment_method")
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        payment_method = body.get('payment_method')
+        print(payment_method)
         customer_name = order.customer_name
 
         if payment_method == "cash":
             payment = Payment.objects.create(
-                razorpay_charge_id=None,
-                customer_name=customer_name,
+                razorpay_charge_id='N/A',
+                customer_name=order.customer_name,
                 amount=order.get_total(),
-                payment_method='cash',
+                payment_method="cash"
             )
             order.payment = payment
             order.ordered = True
             order.save()
             if 'cart' in request.session:
                 request.session['cart'] = {}
-            return JsonResponse({"redirect_url": '/thank-you'}, {"customer_name": customer_name})
+            return JsonResponse({"redirect_url": '/thank-you'})
 
         else:
             if 'razorpay_payment_id' in request.POST:
@@ -246,6 +249,7 @@ class PaymentMethodsView(View):
                     razorpay_client.utility.verify_payment_signature(params_dict)
                     payment = get_object_or_404(Payment, razorpay_charge_id=razorpay_order_id)
                     payment.razorpay_charge_id = razorpay_payment_id
+                    payment.payment_method = 'razorpay'
                     payment.save()
                     order.payment = payment
                     order.ordered = True
@@ -268,7 +272,7 @@ class PaymentMethodsView(View):
 
                 payment = Payment.objects.create(
                     razorpay_charge_id=razorpay_order['id'],
-                    customer_name=customer_name,
+                    customer_name=order.customer_name,
                     amount=order.get_total(),
                     payment_method='razorpay'
                 )

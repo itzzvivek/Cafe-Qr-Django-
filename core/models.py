@@ -106,14 +106,14 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
-    razorpay_charge_id = models.CharField(max_length=50)
+    razorpay_charge_id = models.CharField(max_length=50, null=True, blank=True)
     customer_name = models.CharField(max_length=50)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
     payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES)
 
     def __str__(self):
-        return f"{self.customer_name} - {self.amount}"
+        return f"{self.payment_method} - {self.amount}"
 
 
 class Coupon(models.Model):
