@@ -106,7 +106,7 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
-    payment_charge_id = models.CharField(max_length=50)
+    razorpay_charge_id = models.CharField(max_length=50)
     customer_name = models.CharField(max_length=50)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)

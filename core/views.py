@@ -210,18 +210,18 @@ class PaymentMethodsView(View):
         return render(request, 'user_temp/payments.html', context)
 
     def post(self, request, order_id, *args, **kwargs):
-        order = get_object_or_404(Order, order_id=order_id, ordered=False)
+        order = get_object_or_404(Order, pk=order_id, ordered=False)
         payment_method = request.POST.get("payment_method")
         customer_name = order.customer_name
 
         if payment_method == "cash":
             payment = Payment.objects.create(
-                razorpay_charge_id = "N/A",
+                razorpay_charge_id=None,
                 customer_name=customer_name,
-                amount= order.get_total()
+                amount=order.get_total(),
+                payment_method='cash',
             )
             order.payment = payment
-            order.payment_method = 'cash '
             order.ordered = True
             order.save()
             if 'cart' in request.session:
@@ -229,29 +229,63 @@ class PaymentMethodsView(View):
             return JsonResponse({"redirect_url": '/thank-you'}, {"customer_name": customer_name})
 
         else:
-            total_amount = order.get_total() * 100
-            currency = "INR"
+            if 'razorpay_payment_id' in request.POST:
+                # Handling the UPI payment response
+                razorpay_payment_id = request.POST.get('razorpay_payment_id')
+                razorpay_order_id = request.POST.get('razorpay_order_id')
+                razorpay_signature = request.POST.get('razorpay_signature')
 
-            razorpay_order = razorpay_client.order.create({
-                "amount": int(total_amount),
-                "currency": currency,
-                "payment_capture": "1"
-            })
+                # Verify the payment using Razorpay SDK
+                params_dict = {
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                }
 
-            order.payment = payment_method
-            order.payment_method = 'razorpay'
-            order.save()
+                try:
+                    razorpay_client.utility.verify_payment_signature(params_dict)
+                    payment = get_object_or_404(Payment, razorpay_charge_id=razorpay_order_id)
+                    payment.razorpay_charge_id = razorpay_payment_id
+                    payment.save()
+                    order.payment = payment
+                    order.ordered = True
+                    order.save()
+                    if 'cart' in request.session:
+                        request.session['cart'] = {}
+                    return JsonResponse({"redirect_url": '/thank-you'})
+                except razorpay.errors.SignatureVerificationError:
+                    return JsonResponse({"error": "Payment verification failed."}, status=400)
+            else:
+                # Create Razorpay order for UPI payment
+                total_amount = order.get_total() * 100
+                currency = "INR"
 
-            context = {
-                "razorpay_order_id": razorpay_order['id'],
-                "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-                "amount": float(total_amount),
-                "name": request.user.username,
-                "email": request.user.email,
-                "customer_name": customer_name,
-            }
+                razorpay_order = razorpay_client.order.create({
+                    "amount": int(total_amount),
+                    "currency": currency,
+                    "payment_capture": "1"
+                })
 
-            return JsonResponse(context)
+                payment = Payment.objects.create(
+                    razorpay_charge_id=razorpay_order['id'],
+                    customer_name=customer_name,
+                    amount=order.get_total(),
+                    payment_method='razorpay'
+                )
+
+                order.payment = payment
+                order.save()
+
+                context = {
+                    "razorpay_order_id": razorpay_order['id'],
+                    "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                    "amount": float(total_amount),
+                    "name": request.user.username,
+                    "email": request.user.email,
+                    "customer_name": customer_name,
+                }
+
+                return JsonResponse(context)
 
 
 def thankyou(request, order_id):

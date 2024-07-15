@@ -44,10 +44,8 @@
         .then(data => {
             if (payment_method === 'cash') {
                 alert("Order created successfully. You will be redirected to the thank you page.");
-                //clear the session storage cart data
                 window.location.href = '{% url "core:thank-you" order_id %}';
-                sessionStorage.removeItem('cart')
-
+                sessionStorage.removeItem('cart');
             } else {
                 const options = {
                     "key": data.razorpay_key_id,
@@ -56,9 +54,26 @@
                     "name": data.name,
                     "order_id": data.razorpay_order_id,
                     "handler": function (response) {
-                        sessionStorage.setItem('customer_name', data.customer_name);
-                        alert("Payment Successful");
-                        window.location.href = '{% url "core:thank-you" order_id %}';
+                        const paymentForm = new FormData();
+                        paymentForm.append('razorpay_payment_id', response.razorpay_payment_id);
+                        paymentForm.append('razorpay_order_id', response.razorpay_order_id);
+                        paymentForm.append('razorpay_signature', response.razorpay_signature);
+                        paymentForm.append('payment_method', 'razorpay');
+
+                        fetch("{% url 'core:payment-method' order_id %}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': `{{ csrf_token }}`
+                            },
+                            body: paymentForm
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert("Payment Successful");
+                            window.location.href = '{% url "core:thank-you" order_id %}';
+                            sessionStorage.setItem('customer_name', data.customer_name);
+                        })
+                        .catch(error => console.error("Error:", error));
                     },
                     "prefill": {
                         "name": data.name,
