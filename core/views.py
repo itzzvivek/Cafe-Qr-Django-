@@ -68,6 +68,7 @@ class CartView(View):
 
         default_cafe = Cafe.objects.first()
 
+        # Create a new order
         order = Order.objects.create(
             customer_name=name,
             phone_number=phone,
@@ -78,6 +79,7 @@ class CartView(View):
             cafe=default_cafe
         )
 
+        # Add items to the new order
         for key, item in cart.items():
             try:
                 menu_item = MenuItem.objects.get(slug=key.split("_")[0])
@@ -87,14 +89,16 @@ class CartView(View):
                     item=menu_item,
                     quantity=quantity,
                     is_half_portion=is_half_portion,
-                    ordered=False
+                    ordered=False,
+                    order=order  # Associate this OrderItem with the new Order
                 )
-                order.items.add(order_item)
             except MenuItem.DoesNotExist:
                 continue
 
+        # Save the new order
         order.save()
 
+        # Store order details in the session for later use
         request.session['order_details'] = {
             'name': name,
             'phone': phone,
@@ -102,10 +106,11 @@ class CartView(View):
             'message': message,
         }
 
+        # Clear the cart
         request.session['cart'] = {}
+
         messages.success(request, 'Order has been successfully created')
         return redirect("core:order-details", order_id=order.pk)
-
 
 def add_to_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
@@ -176,8 +181,8 @@ class OrderDetailsView(View):
         total = 0
 
         try:
-            order = Order.objects.get(pk=order_id, ordered=False)
-            for order_item in order.items.all():
+            order = get_object_or_404(Order, pk=order_id)
+            for order_item in order.order_items.all():
                 order_items.append({
                     'item': order_item.item,
                     'quantity': order_item.quantity,

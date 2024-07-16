@@ -54,6 +54,7 @@ class OrderItem(models.Model):
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     is_half_portion = models.BooleanField(default=False)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='order_items', null=True, blank=True)
 
     def __str__(self):
         return f"{self.quantity} of {self.item.name}"
@@ -84,7 +85,6 @@ class Order(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     table_number = models.IntegerField()
     message = models.TextField()
-    items = models.ManyToManyField(OrderItem, related_name='orders')
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
@@ -97,7 +97,7 @@ class Order(models.Model):
 
     def get_total(self):
         total = 0
-        for order_item in self.items.all():
+        for order_item in self.order_items.all():
             if order_item.is_half_portion:
                 total += order_item.item.min_price * order_item.quantity
             else:
