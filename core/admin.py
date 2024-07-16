@@ -9,6 +9,11 @@ def make_refund_accepted(modeladmin, request, queryset):
 make_refund_accepted.short_description = 'Update orders to refund granted'
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+
+
 class MenuItemAdmin(admin.ModelAdmin):
     list_display = ['cafe', 'name', 'max_price', 'min_price', 'category']
     list_filter = ['cafe', 'category']
@@ -39,6 +44,8 @@ class OrderAdmin(admin.ModelAdmin):
                      ]
     actions = [make_refund_accepted]
 
+    inlines = [OrderItemInline]
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         if request.user.is_superuser:
@@ -51,9 +58,13 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ['cafe',]
 
 
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('item', 'quantity', 'is_half_portion', 'order')
+
+
 admin.site.register(MenuItem, MenuItemAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(OrderItem)
+admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Payment)
 admin.site.register(Refund)

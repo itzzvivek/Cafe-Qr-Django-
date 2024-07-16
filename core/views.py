@@ -112,6 +112,7 @@ class CartView(View):
         messages.success(request, 'Order has been successfully created')
         return redirect("core:order-details", order_id=order.pk)
 
+
 def add_to_cart(request, slug):
     item = get_object_or_404(MenuItem, slug=slug)
     is_half_portion = request.GET.get('portion') == 'half'

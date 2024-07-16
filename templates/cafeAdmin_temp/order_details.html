@@ -14,7 +14,7 @@
         <p><strong>Total Amount:</strong> ₹{{ order.get_total }}</p>
         <h2 class="text-2xl font-bold mt-6">Items</h2>
         <ul>
-            {% for item in order.items.all %}
+            {% for item in order.order_items.all %}
             <li>{{ item.quantity }} x {{ item.item.name }} - ₹{{ item.get_total_item_price }}</li>
             {% endfor %}
         </ul>
