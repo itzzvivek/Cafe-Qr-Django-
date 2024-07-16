@@ -73,8 +73,4 @@ This project is an online food ordering system designed for onsite cafes and res
 Contributions are welcome! Please open an issue or submit a pull request.
 
 
-## Contact
-
----
-
 Feel free to customize this README.md to better fit your project specifics and personal preferences.
