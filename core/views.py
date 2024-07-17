@@ -24,6 +24,7 @@ def menu_view(request, cafe_id):
         'categories': categories,
         'menu_items': menu_items,
         'cafe': cafe,
+        'message': "Welcome to our cafe! Enjoy your meal."
     }
     return render(request, 'user_temp/user_menu.html', context)
 

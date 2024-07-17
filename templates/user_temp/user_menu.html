@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+    
 <div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold text-center mb-8">Menu</h1>
+    <h1 class="text-3xl font-bold mb-8 text-center">{{ cafe.cafe_name }}</h1>
+    <div id="message" class="bg-blue-500 text-white p-4 rounded mb-6 hidden">{{ message }}</div>
+    <h1 class="text-3xl font-bold mb-8">Menu</h1>
     <div class="w-full">
         <!-- Category Bar -->
         <div class="w-full mb-8">
@@ -149,6 +152,16 @@
         halfQuantity.value = 0;
         fullQuantity.value = 0;
         itemModal.classList.add('hidden');
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var messageDiv = document.getElementById('message');
+        if (messageDiv) {
+            messageDiv.classList.remove('hidden');
+            setTimeout(function() {
+                messageDiv.classList.add('hidden');
+            }, 5000); // Hide the message after 5 seconds
+        }
     });
 </script>
 {% endblock %}
