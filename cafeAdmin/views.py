@@ -21,7 +21,7 @@ def register_cafe(request):
             email = form.cleaned_data['email']
             cafe_name = form.cleaned_data['cafe_name']
             password = form.cleaned_data['password1']
-            user = User.objects.create_user(username=email, cafe_name=cafe_name, email=email, password=password)
+            user = User.objects.create_user(username=email, email=email, password=password)
             cafe = form.save(commit=False)
             cafe.owner = user
             cafe.save()
